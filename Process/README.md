@@ -53,10 +53,24 @@ Since I have spent so much time debugging Unity , and my project, I did not have
 
 ![This is a photo of my first Unity Prototype](./Media/floatSquare_1.png)
 
+I started my prototype by creating a Bird GameObject, and setting the .png bird image  as the Sprite Rendere Image. I also added a RigidBody object which would allow me to move the bird object.
+
 ![This is a photo of my first Unity Prototype](./Media/floatSquare_2.png)
+
+I added a Circle Collider on my Bird object. I also created a script BirdScript which would allow me to control the bird object with the touch of the space bar. As you see, I was having issues with the script file that was not recognizing the 2DRigidBody.
 
 ![This is a photo of my first Unity Prototype](./Media/floatSquare_3.png)
 
+Here is a screenshot of my BirdScript.cs file where the Update method implements control of the KeyCode.Space.
+
 ![This is a photo of my first Unity Prototype](./Media/floatSquare_4.png)
 
+I started by creating A Pipe GameObject with two GameObjects inside it including a Top Pipe and a Bottom Pipe. Each GameObject has a Pipe .png image set inside a Sprite Rendered. Also, each Pipe has a Script file to control the speed and position.
+
 ![This is a photo of my first Unity Prototype](./Media/floatSquare_5.png)
+
+Here is a screenshot of the PipeMoveScript which controls the speed and transforms the position of each pipe.
+
+![This is a photo of my first Unity Prototype](./Media/floatSquare_6.png)
+
+I created a prefabricated object Pipe which contains the Top and Bottom Pipe objects. I also created a PipeSpawner script which geneartes Pipe objects as you play the game.
