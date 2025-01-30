@@ -42,4 +42,21 @@ Finally to end the level, I have put fire and spiky blocks so if the player fall
 ![This is a photo of the level 2](./Media/TinyThing8.png)
  
 We tested my game in class, and people loved it. They even tried to speed run the game. 
- 
+
+## floatSquare | 01.30.25
+
+### Prototyping with Unity :  
+
+For this first Unity prototype, I have had a lot of issues with instaling Unity on my laptop. I have reinstalled the program several times and have changed editor versions. I have found that version 6000.0.34f1 works best on my computer. I also had to disable roles of Windows Defender because my Unity Projects were not building. Finally, I had to reinstall packages to make my project run without errors.
+
+Since I have spent so much time debugging Unity , and my project, I did not have time to build an in-depth prototype on Unity. Instead, I have focused on learning the basics of Unity by following a 2D tutorial, and trying to replicate the same result on my end on unity. Here is the tutorial that I have followed for this prototype : https://www.youtube.com/watch?v=XtQMytORBmM&ab_channel=GameMaker%27sToolkit. In the future, I wish to modify this game to create a improved and more intresting version of floppy bird, a well-loved game that I used to play on my phone when I was younger.
+
+![This is a photo of my first Unity Prototype](./Media/floatSquare_1.png)
+
+![This is a photo of my first Unity Prototype](./Media/floatSquare_2.png)
+
+![This is a photo of my first Unity Prototype](./Media/floatSquare_3.png)
+
+![This is a photo of my first Unity Prototype](./Media/floatSquare_4.png)
+
+![This is a photo of my first Unity Prototype](./Media/floatSquare_5.png)
