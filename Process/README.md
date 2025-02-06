@@ -74,3 +74,41 @@ Here is a screenshot of the PipeMoveScript which controls the speed and transfor
 ![This is a photo of my first Unity Prototype](./Media/floatSquare_6.png)
 
 I created a prefabricated object Pipe which contains the Top and Bottom Pipe objects. I also created a PipeSpawner script which geneartes Pipe objects as you play the game.
+
+## floatSquare part 2 | 02.06.25
+
+### Prototyping with Unity :  
+
+I decided to continue working on my protype from last week this week, because the game was 
+missing things like a points system, a game over system, and more controls.
+Here is a screenshot of what the game looks like at the beginning of this 
+prototype with the bird jumping through pipes.
+
+![This is a photo of my second Unity Prototype](./Media/floatSquare_7.png)
+
+To make sure the bird disappears after it touches the pipe that is not in between
+the pipes.
+
+![This is a photo of my second Unity Prototype](./Media/floatSquare_8.png)
+
+In this message you can see me adding a box collider in between the space of both pipes.
+I will also be adding a script file to the middle of the prefabricated
+pipe object.
+
+![This is a photo of my second Unity Prototype](./Media/floatSquare_9.png)
+
+In this script, I am adding a getter for a Logic tag script. To make sure this works 
+in Unity, I need to add a Logic tag.
+
+![This is a photo of my second Unity Prototype](./Media/floatSquare_10.png)
+
+In the SampleScene I am adding a new text object after a score text object.
+I also added a Restart button under the GameOver text which triggers the game 
+restard when pressed.
+
+![This is a photo of my second Unity Prototype](./Media/floatSquare_11.png)
+
+The LogicScript.cs file is responsible for implementing the game logic.
+It implements logic like score increase, game restard, and game over.
+
+![This is a photo of my second Unity Prototype](./Media/floatSquare_12.png)
