@@ -122,10 +122,16 @@ It implements logic like score increase, game restard, and game over.
 For this week, I decided to try a new form of prototyping with StoryBoard. This 
 is a prototype for a sewing game. The sewing game would be available for tablet-type devices and will allow users to play through different levels 
 of sewing an item . At the same time users are encouraged to follow the game
-steps in real life, as the steps they play through in the game are actual instructions about how to make an item.
+steps in real life, as the steps they play through in the game are actual instructions about how to sew an item while they learn the basics of the sewing skills.
 
 Here are some key elements of the Sewing Master game.
 
-- Avatar Customization : Players can customize their avatars. Including chnaging their clothes, hair accessories
--
--
+- Avatar Customization : Players can customize their avatars. Including changing their clothes, hair accessories
+- Increased difficulty with the levels : As the player progresses
+in their knowledge with sewing, and completes more levels, the difficulty 
+of the game increases. 
+- Possibility to select different stiching and Sewing Machine tools according
+to the tools that the user has at home : This would allow for better learning 
+for the player as it would be easier for them to follow the same steps in real life as they learn to use their tools.
+- Possibility to learn extra points : Players can earn extra points by submitting pictures of their finished product to the game.
+- Unlock exclusive levels with new patterns and tutorials by competing with other users globally : This would encourage players to complete more levels of the game and rank higher on the global leaderboard.
