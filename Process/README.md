@@ -112,3 +112,20 @@ The LogicScript.cs file is responsible for implementing the game logic.
 It implements logic like score increase, game restard, and game over.
 
 ![This is a photo of my second Unity Prototype](./Media/floatSquare_12.png)
+
+## Sewing Master | 02.13.25
+
+### Prototyping with Storyboard :
+
+![This is a photo of Storyboard prototype](./Media/SewingMaster.jpeg)
+
+For this week, I decided to try a new form of prototyping with StoryBoard. This 
+is a prototype for a sewing game. The sewing game would be available for tablet-type devices and will allow users to play through different levels 
+of sewing an item . At the same time users are encouraged to follow the game
+steps in real life, as the steps they play through in the game are actual instructions about how to make an item.
+
+Here are some key elements of the Sewing Master game.
+
+- Avatar Customization : Players can customize their avatars. Including chnaging their clothes, hair accessories
+-
+-
