@@ -140,6 +140,8 @@ for the player as it would be easier for them to follow the same steps in real l
 
 ### Prototyping with Storyboard :
 
+![This is a photo of Storyboard prototype](./Media/light_orbs-1.jpeg)
+
 For today's week I had the idea to create a game prototype where a player 
 plays as a light orb where light is a limited resource . As the player 
 goes through a labyrinth light from their orb which is their character.
