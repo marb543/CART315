@@ -135,3 +135,26 @@ to the tools that the user has at home : This would allow for better learning
 for the player as it would be easier for them to follow the same steps in real life as they learn to use their tools.
 - Possibility to learn extra points : Players can earn extra points by submitting pictures of their finished product to the game.
 - Unlock exclusive levels with new patterns and tutorials by competing with other users globally : This would encourage players to complete more levels of the game and rank higher on the global leaderboard.
+
+## Light Orbs | 02.20.25
+
+### Prototyping with Storyboard :
+
+For today's week I had the idea to create a game prototype where a player 
+plays as a light orb where light is a limited resource . As the player 
+goes through a labyrinth light from their orb which is their character.
+The player must collect lights as they go though the labyrinth. Shasow monsters
+roam the labyrinth, and steal your light source. Can you escape these shadow 
+monsters and reach the end of the tunnel before you run out of light ?
+
+# Gameplay 
+
+- Some parts of the tunnel only appear when you shine enough light
+on them.
+- Enemies can sense your movement, and steal your light as you move 
+through shadows 
+- Staying too long in one place dims your light of your orb.
+- You can dim or increase your glow as you go through the tunnel.
+- Levels increase difficulty as you move through them 
+- As the level number increases, the number of monsters increase.
+- Secret shadow paths are opened as the player advances through the tunnel.
