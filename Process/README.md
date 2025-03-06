@@ -160,3 +160,52 @@ through shadows
 - Levels increase difficulty as you move through them 
 - As the level number increases, the number of monsters increase.
 - Secret shadow paths are opened as the player advances through the tunnel.
+
+## The Bat that Wasn't | 03.05.25
+
+### Main Idea : 
+For my first iteration prototype, I have chosen my idea of doing a 2D platformer video game where you play as a bat against mice.
+I have gotten this idea in class while thinking of a funny plot twist for a horror-themed video game. In fact, the game would begin
+as you, Dracula accidentally transforming into a mouse. Dracula would be forced to survive in a world of mice. However, when reaching
+a higher level in the videogame Dracula would be able to transform into a bat. The game would be based around puzzles, and
+trying to solve these puzzles. 
+
+![This is a photo of the game cover prototype](./Media/bats_mice_cover.webp)
+
+### Questions I am trying to answer : 
+
+1. What would be an intresting name for my game ? 
+2. What kind of puzzles, enemies, and obstacles can I integrate into the game ?
+3. How many levels would my game be ?
+4. How can I implement humour as a core feeling in my game to keep users engaged ?
+
+### Describe the type of prototype :
+
+This prototype is a look/feel and role concept with a closer look at 
+main plotline and design of characters. My main goal for this prototype 
+is to showcase the uniqueness of my 2D Platformer. Since my game centers 
+around Dracula, and mice, I want my game to be in a humoristic gothic style.
+
+![This is a photo of character design ](./Media/bats_mice_character_design.webp)
+
+### Fidelity level of the prototype :
+
+For this first prototype, I am currently dealing with fidelity at conceptual level.
+I want to be closer to finishing brainstorming for the main elements of the game such as 
+look, character design, name, main gameplay mechanics. This would allow me to work more
+in detail with the visual aspect of the game in my next prototype as I will already have
+my starting assets to begin developping each level.
+
+![This is a photo of an example level for the game ](./Media/bats_mice_example_level.webp)
+
+### Learned Lessons 
+- Humoristic storylines, and an attractive level-design can make the game more engaging for players.
+- Changing between the mice/bat form as Dracula could allow me to use different mechanics when it comes 
+to navigating puzzle-style levels.
+- Character development is crucial when it comes to game design. In fact, it makes the story feel more rich.
+
+### Next Steps 
+- Write a detailed storyline and  script for each of the levels.
+- Create a first-level prototype applying the visual style of the first prototype.
+- Reflect on game mechanics. What kind of functionalities will the game have. 
+- Create and test the early transformation mechanic when Dracula turns into a mouse.
