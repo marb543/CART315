@@ -214,6 +214,31 @@ to navigating puzzle-style levels.
 ## Fang & Claw: A Grabby Situation | 03.13.25
 
 ### Main Idea : 
-For my second iteration prototype, I have decided to go a bit different than my first prototype 
+For my second iteration prototype, I have decided to go a bit different than my first prototype. I decided to change the form of my game, and make it a claw style game inspired by the arcade I have recently visisted myself. I still want to stick to my initial idea of vampires and mice. However, I decided to change the name of the game to : Fang & Claw: A Grabby Situation to have a funny approach to my initial idea. Since I do not have a lot of weeks left to work on my final project, I have decided to build my game on simple concepts, and improve the game upon each iteration.
 
 ![This is a demo of Fang & Claw prototype ](./Media/Fang&Claw-Prototype2.gif)
+
+## Questions I am trying to answer : 
+- How can I create engaging game mechanics that would allow me to simulate the look and feel of a claw machine that can be found at a physical arcade ?
+- How do I provide feedback to players when they catch/lose a ball?
+- How do I balance between a challenging but visually fun game to strike the perfect balance between cozy and funny ?
+
+### Describe the type of prototype/fidelity level/tools :
+- The type of prototype I was working on this week is an implementation prototype. 
+- The fidelity level of this prototype is medium to high because I have started to explore the game look/feel and controls.
+- The tools that I have used for this prototype are : html, css, JavaScript, the p5.js library (as I have experience in building games with p5.js)
+
+### Learned Lessons 
+- Visual feedback is crucial for players.
+- Using randomization for simulating ball positions helps
+in giving a more realistic feel to the game.
+- Animation transition help in making the game feel more smoother.
+- Adding a 25% chance of dropping balls adds an element of 
+unpredictability to the game.
+-Using arrow key controls with a spacebar feel more intuitive.
+
+### Next Steps 
+- Design visuals according to my theme.
+- Implement a scoring system/various game diificulty.
+- Write a storyline related to my theme.
+- Instead of ctaching balls the user will be catching 
