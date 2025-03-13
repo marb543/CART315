@@ -209,3 +209,10 @@ to navigating puzzle-style levels.
 - Create a first-level prototype applying the visual style of the first prototype.
 - Reflect on game mechanics. What kind of functionalities will the game have. 
 - Create and test the early transformation mechanic when Dracula turns into a mouse.
+
+
+## Fang & Claw: A Grabby Situation | 03.13.25
+
+
+
+![This is a demo of Fang & Claw prototype ](./Media/Fang&Claw-Prototype2.mp4)
