@@ -213,6 +213,7 @@ to navigating puzzle-style levels.
 
 ## Fang & Claw: A Grabby Situation | 03.13.25
 
+### Main Idea : 
+For my second iteration prototype, I have decided to go a bit different than my first prototype 
 
-
-![This is a demo of Fang & Claw prototype ](./Media/Fang&Claw-Prototype2.mp4)
+![This is a demo of Fang & Claw prototype ](./Media/Fang&Claw-Prototype2.gif)
