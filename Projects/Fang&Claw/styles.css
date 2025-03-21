@@ -1,0 +1,210 @@
+/* Base styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+}
+
+/* Left sidebar container */
+.sidebar {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Game canvas positioning */
+canvas {
+    position: fixed !important;
+    left: 520px !important;
+    right: 20px !important;
+    top: 20px !important;
+}
+
+/* Common panel styling */
+.panel {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Add connecting borders */
+.panel+.panel {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: -1px;
+}
+
+.panel:not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Controls panel - remove fixed positioning */
+.controls {
+    position: relative;
+    width: 100%;
+}
+
+/* Make all panel headers consistent */
+.panel h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 1.3em;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+}
+
+/* Remove the specific h3 styles from controls */
+.controls h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.controls ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+.controls li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.controls li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #3498db;
+}
+
+/* Score display - remove fixed positioning */
+.score-display {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+
+.score-value {
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 10px 0;
+}
+
+.level-value {
+    color: #3498db;
+}
+
+/* Collection area - remove fixed positioning */
+.collection-area {
+    position: relative;
+    width: 100%;
+}
+
+/* Collection display */
+#collection-display {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Changed from 4 to 3 columns */
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+/* Message popup */
+.message {
+    position: fixed;
+    top: 50%;
+    left: calc(460px + ((100vw - 480px) / 2));
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: none;
+    width: 300px;
+    text-align: center;
+    padding: 15px 25px;
+}
+
+.message p {
+    margin: 10px 0;
+    font-size: 1.2em;
+    color: #2c3e50;
+    word-wrap: break-word;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    border-radius: 50%;
+    background: #e74c3c;
+    color: white;
+    font-weight: bold;
+}
+
+.close-btn:hover {
+    background: #c0392b;
+}
+
+/* Color points styling */
+.color-points {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.color-point {
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* Style for ball count display */
+.ball-count {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 5px;
+}
+
+.ball-type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.ball-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.ball-amount {
+    font-weight: bold;
+    color: #2c3e50;
+}

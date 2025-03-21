@@ -6,74 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fang & Claw: A Grabby Situation</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-
-        .message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            display: none;
-        }
-
-        .close-btn {
-            float: right;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .controls {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .controls h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .controls ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .controls li {
-            margin-bottom: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="controls">
-        <h3>How to Play:</h3>
-        <ul>
-            <li>← → Arrow Keys: Move claw left/right</li>
-            <li>↑ ↓ Arrow Keys: Move claw up/down</li>
-            <li>Space: Open/Close claw to grab balls</li>
-            <li>Warning: Balls might slip away at the top!</li>
-        </ul>
+    <div class="sidebar">
+        <div class="controls panel">
+            <h3>How to Play</h3>
+            <ul>
+                <li>← → Arrow Keys: Move claw left/right</li>
+                <li>↑ ↓ Arrow Keys: Move claw up/down</li>
+                <li>Space: Open/Close claw to grab balls</li>
+                <li>Warning: Balls might slip away at the top!</li>
+            </ul>
+        </div>
+
+        <div class="collection-area panel">
+            <h3>Collection Area</h3>
+            <div id="collection-display"></div>
+        </div>
+
+        <div class="score-display panel">
+            <h3>Game Stats</h3>
+            <div class="score-value">Score: <span id="score-display">0</span></div>
+            <div class="level-value">Level: <span id="level-display">1</span></div>
+        </div>
     </div>
-    <div id="message" class="message">
-        <span class="close-btn" onclick="closeMessage()">X</span>
+
+    <div id="message" class="message panel">
+        <span class="close-btn" onclick="closeMessage()">×</span>
         <p id="message-text"></p>
     </div>
+
     <script src="sketch.js"></script>
 </body>
 
