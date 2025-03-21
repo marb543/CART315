@@ -242,3 +242,46 @@ unpredictability to the game.
 - Implement a scoring system/various game diificulty.
 - Write a storyline related to my theme.
 - Instead of ctaching balls the user will be catching 
+
+
+## Fang & Claw: A Grabby Situation (Iteration 3) | 03.20.25
+
+## What is the objective of this iteration ? : 
+For this iteration of my project, the objective was mainly to improve game mechanics, and add missing elements such as different levels, a scoring system, physics for balls, dynamic ball behavior, and improve the look, and feel of the user interface. I feel like I was able to touch upon all these points in my second iteration of this prototype.
+
+![This is a demo of Fang & Claw prototype 3 ](./Media/Fang&Claw-Prototype3.gif)
+
+### Newly added features :
+1. Timer System : I added a 60-second time limit per level. The player must reach required points before time runs out (I increment the number of points by 50 for each e level).
+2. Progressive Difficulty : I made sure to change the logic of the game so that balls move faster in higher levels. One important point that I have worked on for this iteration is that initial velocity increases with level. There are alsomfewer but more valuable balls in later levels.
+3. Scoring System Improvements: There are level-specific scores. I also added total score tracking. Players are required to reach a points threshold for each level. To make it easier for players to keep track of their points : score resets between levels.
+4. Ball Behavior Enhancement: I worked on implementing escape mechanics when claw approaches using friction and bounce physics. To make each level more difficult, speed limits increase with each level. There are also more predictable movement patterns.
+5. UI Improvements : To improve the UI, I worked on auto-hiding status messages.I added Game over screen with total score, a collection area with the number of each type of collected ball.
+
+## Questions I am trying to answer : 
+1. How to create meaningful progression within my game?
+2. What is the best way to balance difficulty across levels?
+3. How to make sure that my game stays challenging but fair?
+4. How to make sure that the provided feedback for players is clear and time sensistive?
+5. How to maintain player engagement all throughout the game?
+
+### Describe the type of prototype/fidelity level/tools :
+- Fidelity Level: This is a medium to high prototype.
+- Tools: I used p5.js for game mechanics, HTML/CSS for building the UI of my game.
+- Type: This is a functional prototype because it makes use of the whole game loop.
+- Focus: The focus of this prototype was on game mechanics.
+
+### Learned Lessons 
+- Time pressure adds excitement without frustrating players
+- Progressive difficulty keeps the game challenging
+- Clear feedback helps players understand their progress
+- Balance between random and predictable ball movement is crucial
+- A simple and Compact UI helps maintain focus on gameplay
+
+### Next Steps 
+1. Add sound effects for better feedback.
+3. Add power-ups or special balls.
+4. Create tutorial level.
+5. Add visual effects for level transitions.
+6. Create visuals for bats/vampires to replace current ball objects.
+7. Implement the main game storyline within game mechanics.
