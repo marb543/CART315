@@ -285,3 +285,70 @@ For this iteration of my project, the objective was mainly to improve game mecha
 5. Add visual effects for level transitions.
 6. Create visuals for bats/vampires to replace current ball objects.
 7. Implement the main game storyline within game mechanics.
+
+
+## Fang & Claw: A Grabby Situation (Iteration 4) | 03.27.25
+
+## Overview
+This iteration focuses on enhancing player feedback, introducing a power-up system, improving UI responsiveness.
+
+![This is a demo of Fang & Claw prototype 4](./Media/Fang&Claw-Prototype4.1.png)
+
+![This is a demo of Fang & Claw prototype 4](./Media/Fang&Claw-Prototype4.2.png)
+
+## What is the objective of this iteration ? : 
+- I made sure to enhance player feedback with sound and visual effects.
+- I implemented a power-up system for gameplay variety.
+- I improved UI responsiveness and messaging.
+
+### Newly added features :
+## 1.Sound System Integration
+- grab.mp3 – Claw grabbing balls. - source : https://pixabay.com/sound-effects/ding-1-14705/
+- drop.mp3 – Balls being dropped. - source : https://pixabay.com/sound-effects/thud-291047/
+- collect.mp3 – Successful ball collection.- source : https://pixabay.com/sound-effects/reload-123781/
+- levelup.mp3 – Level completion.- source : https://pixabay.com/sound-effects/c-chord-83638/
+- gameover.mp3 – Game over state.- source : https://pixabay.com/sound-effects/playful-failure-310480/
+
+## 2.Power-Up System
+- Magnetic Claw (Purple): Increases grab range.
+- Double Points (Cyan): Doubles score for collected balls.
+- Slow Motion (Gold): Reduces ball movement speed.
+
+## 3.Enhanced Message System
+- Auto-hiding messages with varied durations.
+- Color-coded feedback: Green = (points gained), Red = (losses).
+- Improved positioning and styling.
+
+## Questions I am trying to answer : 
+- Are power-ups intuitive and impactful?
+- Does audio feedback enhance engagement?
+- Is the feedback system clear and satisfying?
+- How to manage multiple power-up effects effectively?
+- How to balance visual feedback without overwhelming players?
+
+### Describe the type of prototype/fidelity level/tools :
+- Fidelity Level: This is a medium to high prototype.
+- Tools: I used p5.js for game mechanics, HTML/CSS for building the UI of my game, p5.sound for audio handling.
+- Type: This is a mix of implementation prototype, and look & feel prototype.
+- Focus: The focus of this prototype was on  sound system, power-ups, UI, visual feedback.
+
+## Lessons Learned
+- Proper error handling is essential for sound loading.
+- Auto-hiding messages improve game flow.
+- Power-up effects need distinct visual indicators.
+- Auto-hiding messages maintain fluidity in gameplay.
+- Sound effects enhance immersion.
+- Visual feedback clarifies game events.
+
+## Next Steps
+1. Add particle effects for power-up collection.
+2. Improve power-up visual indicators.
+3. Enhance level transition animations.
+4. Implement a combo system.
+5. Add more power-up types.
+6. Create an achievement system.
+7. Optimize sound loading.
+8. Implement screen shake effects.
+9. Add a settings menu.
+10. Improve power-up status display.
+
