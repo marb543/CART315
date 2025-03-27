@@ -31,6 +31,100 @@ let gameOver = false;
 let requiredPoints = 100; // Base required points
 let levelStartScore = 0; // To track points earned in current level
 let totalScore = 0;
+let highScore = 0;
+
+// Add after the global variables
+let sounds = {
+  grab: null,
+  drop: null,
+  collect: null,
+  levelUp: null,
+  gameOver: null
+};
+
+// Add to global variables
+const POWERUP_TYPES = {
+  MAGNET: {
+    color: '#FF00FF',
+    duration: 5000,
+    description: 'Magnetic Claw',
+    effect: () => { claw.size *= 1.5; } // Increase grab range
+  },
+  DOUBLE_POINTS: {
+    color: '#00FFFF',
+    duration: 10000,
+    description: '2x Points',
+    effect: () => { /* already handled in collectBall */ }
+  },
+  SLOW_TIME: {
+    color: '#FFD700',
+    duration: 8000,
+    description: 'Slow Motion',
+    effect: () => {
+      for (let ball of balls) {
+        ball.vx *= 0.5;
+        ball.vy *= 0.5;
+      }
+    }
+  }
+};
+
+let activePowerups = {
+  MAGNET: false,
+  DOUBLE_POINTS: false,
+  SLOW_TIME: false
+};
+
+// Add to global variables
+let isTutorial = true;
+let tutorialStep = 0;
+
+// Add to global variables
+let isTransitioning = false;
+let transitionAlpha = 0;
+let transitionDirection = 1;
+
+// Add these variables at the top with other global variables
+let soundsLoaded = false;
+let soundsEnabled = false;
+
+/***********************************
+ * GAME INITIALIZATION
+ ***********************************/
+
+function preload() {
+  if (window.AudioContext || window.webkitAudioContext) {
+    soundsEnabled = true;
+    try {
+      soundFormats('mp3');
+      const soundFiles = {
+        grab: 'grab',
+        drop: 'drop',
+        collect: 'collect',
+        levelUp: 'levelup',
+        gameOver: 'gameover'
+      };
+
+      // Load each sound file
+      for (const [key, filename] of Object.entries(soundFiles)) {
+        sounds[key] = loadSound(`sounds/${filename}.mp3`,
+          () => console.log(`${key} sound loaded successfully`),
+          (err) => {
+            console.error(`Error loading ${key} sound:`, err);
+            soundsEnabled = false;
+          }
+        );
+      }
+      soundsLoaded = true;
+    } catch (e) {
+      console.error('Sound system initialization failed:', e);
+      soundsEnabled = false;
+    }
+  } else {
+    console.log('WebAudio not supported in this browser');
+    soundsEnabled = false;
+  }
+}
 
 /**
  * Initializes the game environment and canvas.
@@ -38,8 +132,18 @@ let totalScore = 0;
  * This is called once when the game starts.
  */
 function setup() {
+  console.log('Setup running...');
   createCanvas(720, 550);
+  loadHighScore();
   resetLevel(level);
+
+  // If sounds haven't loaded after 3 seconds, disable them and continue
+  setTimeout(() => {
+    if (!soundsLoaded) {
+      console.log('Sound loading timed out, continuing without sound');
+      soundsEnabled = false;
+    }
+  }, 3000);
 }
 
 /**
@@ -97,6 +201,9 @@ function resetLevel(currentLevel) {
 
   // Increase required points for each level
   requiredPoints = 100 + (currentLevel - 1) * 50;
+
+  // Add power-up balls
+  addPowerupBalls();
 }
 
 /**
@@ -137,6 +244,10 @@ function getCurrentDifficulty() {
   return 'hard';
 }
 
+/***********************************
+ * MAIN GAME LOOP
+ ***********************************/
+
 /**
  * Main game loop handling all game mechanics and rendering.
  * Processes in this order:
@@ -149,6 +260,15 @@ function getCurrentDifficulty() {
 function draw() {
   if (gameOver) {
     showGameOver();
+    return;
+  }
+
+  if (isTutorial) {
+    showTutorial();
+  }
+
+  if (isTransitioning) {
+    drawLevelTransition();
     return;
   }
 
@@ -177,6 +297,10 @@ function draw() {
   updateUI();
   drawTimer();
 }
+
+/***********************************
+ * GAME MECHANICS
+ ***********************************/
 
 /**
  * Processes keyboard input for claw movement.
@@ -299,14 +423,41 @@ function updatePhysics() {
 function drawBalls() {
   noStroke();
   for (let ball of balls) {
-    fill(ball.color);
-    if (ball.selected) {
-      stroke(0);
-      strokeWeight(2);
+    // Special rendering for power-up balls
+    if (ball.isPowerup) {
+      // Draw sparkle effect
+      push();
+      translate(ball.x, ball.y);
+      rotate(ball.sparkleAngle);
+      ball.sparkleAngle += 0.05; // Rotate sparkle
+
+      // Draw star shape
+      fill(ball.color);
+      beginShape();
+      for (let i = 0; i < 10; i++) {
+        let radius = i % 2 === 0 ? ball.size : ball.size * 0.5;
+        let angle = (i * TWO_PI) / 10;
+        vertex(cos(angle) * radius, sin(angle) * radius);
+      }
+      endShape(CLOSE);
+
+      // Add glow effect
+      drawingContext.shadowBlur = 10;
+      drawingContext.shadowColor = ball.color;
+      circle(0, 0, ball.size * 0.8);
+      drawingContext.shadowBlur = 0;
+      pop();
     } else {
-      noStroke();
+      // Normal ball rendering
+      fill(ball.color);
+      if (ball.selected) {
+        stroke(0);
+        strokeWeight(2);
+      } else {
+        noStroke();
+      }
+      circle(ball.x, ball.y, ball.size);
     }
-    circle(ball.x, ball.y, ball.size);
   }
 }
 
@@ -335,6 +486,7 @@ function updateUI() {
   document.getElementById('score-display').textContent = score;
   document.getElementById('level-display').textContent = level;
   updateCollectionDisplay();
+  drawPowerupStatus();
 }
 
 /**
@@ -398,6 +550,7 @@ function dropBall(ball) {
   if (index > -1) {
     selectedBalls.splice(index, 1);
   }
+  playSound('drop');
   showMessage('lost');
 }
 
@@ -406,7 +559,14 @@ function dropBall(ball) {
  * @param {Object} ball - The ball to collect
  */
 function collectBall(ball) {
-  score += ball.value;
+  if (ball.isPowerup) {
+    activatePowerup(ball.powerupType);
+  }
+
+  // Apply double points if powerup is active
+  let pointMultiplier = activePowerups.DOUBLE_POINTS ? 2 : 1;
+  score += ball.value * pointMultiplier;
+
   collectedBalls.push({
     color: ball.color,
     size: ball.size
@@ -417,8 +577,8 @@ function collectBall(ball) {
     balls.splice(ballIndex, 1);
   }
 
-  // Show points gained instead of ball color message
-  showMessage(`+${ball.value}`);
+  playSound('collect');
+  showMessage(`+${ball.value * pointMultiplier}`);
 }
 
 /**
@@ -432,6 +592,7 @@ function grabNearbyBalls() {
       selectedBalls.push(ball);
       ball.x = claw.x;
       ball.y = claw.y + 30;
+      playSound('grab');
     }
   }
 }
@@ -449,28 +610,27 @@ function showMessage(text) {
   // Use green background for points, red for lost ball
   messageDiv.style.backgroundColor = text.includes('+') ? '#d4ffd4' : '#ffebeb';
 
-  // Auto-hide points messages after 1 second
-  if (text.includes('+')) {
-    setTimeout(() => {
-      messageDiv.style.display = 'none';
-    }, 1000);
+  // Clear any existing timeout
+  if (messageDiv.hideTimeout) {
+    clearTimeout(messageDiv.hideTimeout);
   }
+
+  // Set timeout duration based on message type
+  let duration = text.includes('+') ? 1000 : 2000; // 1s for points, 2s for lost
+
+  // Auto-hide message after duration
+  messageDiv.hideTimeout = setTimeout(() => {
+    messageDiv.style.display = 'none';
+  }, duration);
 }
 
 /**
  * Shows the level completion message
  */
 function showLevelComplete() {
-  let messageDiv = document.getElementById('message');
-  let messageText = document.getElementById('message-text');
-  messageText.innerText = `Level ${level} Complete! Score: ${score}`;
-  messageDiv.style.display = 'block';
-  messageDiv.style.backgroundColor = '#d4ffd4';
-
-  // Auto-hide the level complete message after 2 seconds
-  setTimeout(() => {
-    messageDiv.style.display = 'none';
-  }, 2000);
+  isTransitioning = true;
+  transitionAlpha = 0;
+  playSound('levelUp');
 }
 
 /**
@@ -542,12 +702,195 @@ function checkLevelCompletion() {
  */
 function showGameOver() {
   background(220);
+  let finalScore = totalScore + score;
+  let newHighScore = updateHighScore(finalScore);
+
   textSize(32);
   textAlign(CENTER, CENTER);
   fill(0);
-  text('GAME OVER', width / 2, height / 2 - 40);
+  text('GAME OVER', width / 2, height / 2 - 60);
+
   textSize(24);
-  text(`Level ${level} Score: ${score}`, width / 2, height / 2 - 10);
-  text(`Total Score: ${totalScore + score}`, width / 2, height / 2 + 20);
-  text('Press SPACE to restart', width / 2, height / 2 + 50);
+  text(`Level ${level} Score: ${score}`, width / 2, height / 2 - 20);
+  text(`Total Score: ${finalScore}`, width / 2, height / 2 + 10);
+  text(`High Score: ${highScore}`, width / 2, height / 2 + 40);
+
+  if (newHighScore) {
+    fill('#FFD700');
+    text('NEW HIGH SCORE!', width / 2, height / 2 + 70);
+  }
+
+  fill(0);
+  text('Press SPACE to restart', width / 2, height / 2 + 100);
+
+  playSound('gameOver');
+}
+
+function loadHighScore() {
+  let saved = localStorage.getItem('clawGameHighScore');
+  highScore = saved ? parseInt(saved) : 0;
+}
+
+function updateHighScore(score) {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('clawGameHighScore', highScore);
+    return true;
+  }
+  return false;
+}
+
+// Add to the resetLevel function after creating regular balls
+function addPowerupBalls() {
+  let powerupCount = min(Math.floor(level / 2), 3);
+
+  for (let i = 0; i < powerupCount; i++) {
+    let powerupType = random(Object.keys(POWERUP_TYPES));
+    let powerup = POWERUP_TYPES[powerupType];
+
+    balls.push({
+      x: random(50, width - 50),
+      y: random(100, height - 50),
+      color: powerup.color,
+      size: 25,
+      selected: false,
+      vx: random(-0.5, 0.5),
+      vy: random(-0.5, 0.5),
+      isPowerup: true,
+      powerupType: powerupType,
+      value: 50,
+      sparkleAngle: 0 // For visual effect
+    });
+  }
+}
+
+function activatePowerup(type) {
+  const powerup = POWERUP_TYPES[type];
+  activePowerups[type] = true;
+
+  // Apply power-up effect
+  if (powerup.effect) {
+    powerup.effect();
+  }
+
+  // Show visual feedback
+  showMessage(`${powerup.description} ACTIVATED!`);
+
+  // Set up expiration
+  setTimeout(() => {
+    deactivatePowerup(type);
+  }, powerup.duration);
+}
+
+// Add new function to handle power-up deactivation
+function deactivatePowerup(type) {
+  activePowerups[type] = false;
+
+  // Reverse effects
+  switch (type) {
+    case 'MAGNET':
+      claw.size = 40; // Reset to original size
+      break;
+    case 'SLOW_TIME':
+      // Reset ball speeds to normal
+      for (let ball of balls) {
+        ball.vx *= 2;
+        ball.vy *= 2;
+      }
+      break;
+  }
+
+  showMessage(`${POWERUP_TYPES[type].description} EXPIRED`);
+}
+
+// Add new function
+function showTutorial() {
+  if (!isTutorial) return;
+
+  let messages = [
+    "Use ←→ arrows to move the claw left and right",
+    "Use ↑↓ arrows to move up and down",
+    "Press SPACE to grab balls",
+    "Bring balls to the top to collect them",
+    "Different colors are worth different points!",
+    "Watch out for power-ups!"
+  ];
+
+  fill(0, 0, 0, 200);
+  rect(0, height - 100, width, 100);
+
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text(messages[tutorialStep], width / 2, height - 50);
+
+  // Progress tutorial based on actions
+  if (tutorialStep === 0 && (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW))) {
+    tutorialStep++;
+  } else if (tutorialStep === 1 && (keyIsDown(UP_ARROW) || keyIsDown(DOWN_ARROW))) {
+    tutorialStep++;
+  } else if (tutorialStep === 2 && !claw.open) {
+    tutorialStep++;
+  } else if (tutorialStep === 3 && collectedBalls.length > 0) {
+    tutorialStep++;
+  }
+
+  if (tutorialStep >= messages.length - 1) {
+    isTutorial = false;
+  }
+}
+
+// Add new function
+function drawLevelTransition() {
+  if (!isTransitioning) return;
+
+  push();
+  background(220);
+  fill(0, 0, 0, transitionAlpha);
+  rect(0, 0, width, height);
+
+  if (transitionAlpha > 0) {
+    fill(255);
+    textSize(48);
+    textAlign(CENTER, CENTER);
+    text(`Level ${level}`, width / 2, height / 2);
+  }
+
+  transitionAlpha += transitionDirection * 5;
+
+  if (transitionAlpha > 255) {
+    transitionDirection = -1;
+  } else if (transitionAlpha < 0) {
+    isTransitioning = false;
+    transitionDirection = 1;
+  }
+  pop();
+}
+
+// Update the playSound function
+function playSound(soundName) {
+  if (soundsEnabled && soundsLoaded && sounds[soundName]) {
+    try {
+      sounds[soundName].play();
+    } catch (e) {
+      console.error(`Error playing ${soundName}:`, e);
+    }
+  }
+}
+
+// New function to show active power-ups
+function drawPowerupStatus() {
+  let y = 70;
+  textAlign(LEFT, TOP);
+  textSize(16);
+  fill(0);
+  noStroke();
+
+  Object.entries(activePowerups).forEach(([type, active]) => {
+    if (active) {
+      fill(POWERUP_TYPES[type].color);
+      text(`${POWERUP_TYPES[type].description} ACTIVE`, 20, y);
+      y += 20;
+    }
+  });
 } 
