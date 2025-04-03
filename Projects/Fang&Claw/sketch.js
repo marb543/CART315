@@ -20,20 +20,24 @@ let level = 1;
 let gravity = 0.5;
 let swingForce = 0.2;
 let chainLength = 50;
+
+// Game difficulty settings
 let gameLevel = {
   easy: { dropChance: 0.15, swingForce: 0.1, speed: 4 },
   medium: { dropChance: 0.25, swingForce: 0.2, speed: 5 },
   hard: { dropChance: 0.35, swingForce: 0.3, speed: 6 }
 };
+
+// Timer and scoring variables
 let timeLeft = 60;
 let lastTime = 0;
 let gameOver = false;
-let requiredPoints = 100; // Base required points
-let levelStartScore = 0; // To track points earned in current level
+let requiredPoints = 100;
+let levelStartScore = 0;
 let totalScore = 0;
 let highScore = 0;
 
-// Add after the global variables
+// Sound system variables
 let sounds = {
   grab: null,
   drop: null,
@@ -42,22 +46,22 @@ let sounds = {
   gameOver: null
 };
 
-// Add to global variables
+// Power-up definitions
 const POWERUP_TYPES = {
   MAGNET: {
-    color: '#FF00FF',
+    color: '#9b59b6',
     duration: 5000,
     description: 'Magnetic Claw',
-    effect: () => { claw.size *= 1.5; } // Increase grab range
+    effect: () => { claw.size *= 1.5; }
   },
   DOUBLE_POINTS: {
-    color: '#00FFFF',
+    color: '#ff6b00',
     duration: 10000,
     description: '2x Points',
-    effect: () => { /* already handled in collectBall */ }
+    effect: () => { }
   },
   SLOW_TIME: {
-    color: '#FFD700',
+    color: '#2ecc71',
     duration: 8000,
     description: 'Slow Motion',
     effect: () => {
@@ -69,30 +73,68 @@ const POWERUP_TYPES = {
   }
 };
 
+// Power-up state tracking
 let activePowerups = {
   MAGNET: false,
   DOUBLE_POINTS: false,
   SLOW_TIME: false
 };
 
-// Add to global variables
+// Game state flags
 let isTutorial = true;
 let tutorialStep = 0;
-
-// Add to global variables
 let isTransitioning = false;
 let transitionAlpha = 0;
 let transitionDirection = 1;
-
-// Add these variables at the top with other global variables
 let soundsLoaded = false;
 let soundsEnabled = false;
+let userInteracted = false;
+let backgroundImg;
+let gameOverImg;
+let assetsLoaded = 0;
+let totalAssets = 8;
+let backgroundMusic;
+let musicStarted = false;
+let gameStarted = false;
+let timerFlashAlpha = 0;
+let timerFlashDirection = 1;
 
 /***********************************
  * GAME INITIALIZATION
  ***********************************/
 
 function preload() {
+  try {
+    backgroundImg = loadImage('images/main_background.png',
+      () => {
+        console.log('Background image loaded successfully');
+        assetsLoaded++;
+      },
+      () => {
+        console.error('Failed to load background image');
+        backgroundImg = null;
+        assetsLoaded++;
+      }
+    );
+
+    gameOverImg = loadImage('images/game_over.png',
+      () => {
+        console.log('Game over image loaded successfully');
+        assetsLoaded++;
+      },
+      () => {
+        console.error('Failed to load game over image');
+        gameOverImg = null;
+        assetsLoaded++;
+      }
+    );
+  } catch (e) {
+    console.error('Error loading images:', e);
+    backgroundImg = null;
+    gameOverImg = null;
+    assetsLoaded += 2;
+  }
+
   if (window.AudioContext || window.webkitAudioContext) {
     soundsEnabled = true;
     try {
@@ -102,16 +144,20 @@ function preload() {
         drop: 'drop',
         collect: 'collect',
         levelUp: 'levelup',
-        gameOver: 'gameover'
+        gameOver: 'game_over'
       };
 
       // Load each sound file
       for (const [key, filename] of Object.entries(soundFiles)) {
         sounds[key] = loadSound(`sounds/${filename}.mp3`,
-          () => console.log(`${key} sound loaded successfully`),
+          () => {
+            console.log(`${key} sound loaded successfully`);
+            assetsLoaded++;
+          },
           (err) => {
             console.error(`Error loading ${key} sound:`, err);
             soundsEnabled = false;
+            assetsLoaded++;
           }
         );
       }
@@ -119,10 +165,32 @@ function preload() {
     } catch (e) {
       console.error('Sound system initialization failed:', e);
       soundsEnabled = false;
+      assetsLoaded += 5; // Count all sound files as loaded
     }
   } else {
     console.log('WebAudio not supported in this browser');
     soundsEnabled = false;
+    assetsLoaded += 5; // Count all sound files as loaded
+  }
+
+  // Modify the preload function's background music loading part
+  try {
+    backgroundMusic = loadSound('sounds/background_sound.mp3',
+      () => {
+        console.log('Background music loaded successfully');
+        // Don't set volume here, wait until we actually play
+        assetsLoaded++;
+      },
+      (err) => {
+        console.error('Error loading background music:', err);
+        backgroundMusic = null;
+        assetsLoaded++;
+      }
+    );
+  } catch (e) {
+    console.error('Error loading background music:', e);
+    backgroundMusic = null;
+    assetsLoaded++;
   }
 }
 
@@ -133,9 +201,27 @@ function preload() {
  */
 function setup() {
   console.log('Setup running...');
-  createCanvas(720, 550);
+
+  // Calculate canvas size based on available space
+  let availableWidth = windowWidth * 0.76 - windowWidth * 0.02; // 76% of window minus 2vw padding
+  let availableHeight = windowHeight * 0.96; // 96vh
+
+  // Maintain aspect ratio while fitting available space
+  let canvasWidth = min(availableWidth, availableHeight * 1.18);
+  let canvasHeight = canvasWidth / 1.18;
+
+  // Create canvas with calculated dimensions
+  createCanvas(canvasWidth, canvasHeight);
+
+  // Rest of your setup code
   loadHighScore();
   resetLevel(level);
+  textFont('Press Start 2P');
+
+  // Add a slight delay before starting music to ensure everything is loaded
+  setTimeout(() => {
+    startBackgroundMusic();
+  }, 1000);
 
   // If sounds haven't loaded after 3 seconds, disable them and continue
   setTimeout(() => {
@@ -144,6 +230,22 @@ function setup() {
       soundsEnabled = false;
     }
   }, 3000);
+}
+
+// Update window resize handler
+function windowResized() {
+  let availableWidth = windowWidth * 0.76 - windowWidth * 0.02;
+  let availableHeight = windowHeight * 0.96;
+
+  let canvasWidth = min(availableWidth, availableHeight * 1.18);
+  let canvasHeight = canvasWidth / 1.18;
+
+  resizeCanvas(canvasWidth, canvasHeight);
+
+  if (claw) {
+    claw.x = constrain(claw.x, 50, width - 50);
+    claw.y = constrain(claw.y, 50, height - 50);
+  }
 }
 
 /**
@@ -204,6 +306,12 @@ function resetLevel(currentLevel) {
 
   // Add power-up balls
   addPowerupBalls();
+
+  // Reset timer but only start counting if game has started
+  timeLeft = 60;
+  if (gameStarted) {
+    lastTime = millis();
+  }
 }
 
 /**
@@ -258,6 +366,17 @@ function getCurrentDifficulty() {
  * 5. Updates UI and score display
  */
 function draw() {
+  if (!gameStarted) {
+    // Show waiting screen
+    background(0);
+    push();
+    setStandardText(16);
+    textAlign(CENTER, CENTER);
+    text('PRESS ANY KEY TO START', width / 2, height / 2);
+    pop();
+    return;
+  }
+
   if (gameOver) {
     showGameOver();
     return;
@@ -272,8 +391,17 @@ function draw() {
     return;
   }
 
-  background(220);
-  stroke(0);
+  // Draw background
+  if (backgroundImg) {
+    // Draw the background image
+    image(backgroundImg, 10, 10, width - 20, height - 20);
+  } else {
+    // Fallback to black background if image fails to load
+    background(0);
+  }
+
+  // Draw game border
+  stroke('#ff6b00'); // Orange border
   strokeWeight(4);
   noFill();
   rect(10, 10, width - 20, height - 20);
@@ -310,17 +438,18 @@ function draw() {
  * Movement speed increases with difficulty level
  */
 function handleClawMovement() {
+  const speed = claw.speed;
   if (keyIsDown(LEFT_ARROW)) {
-    claw.x = max(50, claw.x - claw.speed);
+    claw.x = constrain(claw.x - speed, 50, width - 50);
   }
   if (keyIsDown(RIGHT_ARROW)) {
-    claw.x = min(width - 50, claw.x + claw.speed);
+    claw.x = constrain(claw.x + speed, 50, width - 50);
   }
   if (keyIsDown(DOWN_ARROW)) {
-    claw.y = min(height - 50, claw.y + claw.speed);
+    claw.y = constrain(claw.y + speed, 50, height - 50);
   }
   if (keyIsDown(UP_ARROW)) {
-    claw.y = max(50, claw.y - claw.speed);
+    claw.y = constrain(claw.y - speed, 50, height - 50);
   }
 }
 
@@ -335,14 +464,16 @@ function handleClawMovement() {
  */
 function updatePhysics() {
   let difficulty = getCurrentDifficulty();
+
+  // Optimize claw physics
   claw.swingVelocity += sin(claw.angle) * gameLevel[difficulty].swingForce;
   claw.angle += claw.swingVelocity;
-  claw.angle *= 0.99;
+  claw.angle = constrain(claw.angle, -PI / 4, PI / 4); // Limit swing angle
   claw.swingVelocity *= 0.99;
 
   let actualX = claw.x + sin(claw.angle) * 10;
 
-  // Update selected balls
+  // Update selected balls more efficiently
   for (let ball of selectedBalls) {
     if (!claw.open) {
       ball.x = actualX;
@@ -350,68 +481,34 @@ function updatePhysics() {
       ball.vx = 0;
       ball.vy = 0;
     } else {
-      ball.vy += gravity;
-      ball.y += ball.vy;
-      ball.x += ball.vx;
-
-      if (ball.y > height - ball.size / 2) {
-        ball.y = height - ball.size / 2;
-        ball.vy *= -0.6;
-      }
+      ball.vy = constrain(ball.vy + gravity, -10, 10);
+      ball.y = constrain(ball.y + ball.vy, ball.size / 2, height - ball.size / 2);
+      ball.x = constrain(ball.x + ball.vx, 50, width - 50);
     }
   }
 
-  // Update free balls
+  // Optimize free ball physics
   for (let ball of balls) {
     if (!ball.selected) {
-      // Check distance to claw
       let d = dist(claw.x, claw.y + 20, ball.x, ball.y);
 
-      // Reduce escape chance and range
-      if (d < claw.size * 1.5 && random() < 0.15) { // Reduced range and chance (was 2 and 0.3)
-        // Calculate direction away from claw
+      // Simplified escape behavior
+      if (d < claw.size * 1.5 && random() < 0.15) {
         let angle = atan2(ball.y - (claw.y + 20), ball.x - claw.x);
-        let escapeSpeed = 2.5; // Reduced escape speed (was 4)
-        ball.vx = cos(angle) * escapeSpeed;
-        ball.vy = sin(angle) * escapeSpeed;
+        ball.vx = cos(angle) * 2.5;
+        ball.vy = sin(angle) * 2.5;
       }
 
-      // Update position
-      ball.x += ball.vx;
-      ball.y += ball.vy;
+      // Update position with constraints
+      ball.x = constrain(ball.x + ball.vx, 50, width - 50);
+      ball.y = constrain(ball.y + ball.vy, 100, height - 50);
 
-      // Bounce off walls with more friction
-      if (ball.x < 50 || ball.x > width - 50) {
-        ball.vx *= -0.8; // Added more friction on bounce (was -1)
-        ball.x = constrain(ball.x, 50, width - 50);
-      }
+      // Bounce handling
+      if (ball.x <= 50 || ball.x >= width - 50) ball.vx *= -0.8;
+      if (ball.y <= 100 || ball.y >= height - 50) ball.vy *= -0.8;
 
-      // Bounce off top and bottom with more friction
-      if (ball.y < 100 || ball.y > height - 50) {
-        ball.vy *= -0.8; // Added more friction on bounce (was -1)
-        ball.y = constrain(ball.y, 100, height - 50);
-      }
-
-      // Reduced random movement
-      if (random() < 0.01) { // Reduced chance of direction change (was 0.02)
-        ball.vx += random(-0.3, 0.3); // Reduced random movement (was -0.5, 0.5)
-        ball.vy += random(-0.3, 0.3);
-
-        // Lower speed limits
-        let speed = sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-        let levelSpeedMultiplier = 1 + (level * 0.2);
-        let maxSpeed = 2 * levelSpeedMultiplier;
-        if (d < claw.size * 1.5) {
-          maxSpeed = 2.5 * levelSpeedMultiplier;
-        }
-        if (speed > maxSpeed) {
-          ball.vx = (ball.vx / speed) * maxSpeed;
-          ball.vy = (ball.vy / speed) * maxSpeed;
-        }
-      }
-
-      // Increased friction to slow balls down more quickly
-      ball.vx *= 0.99; // More friction (was 0.995)
+      // Apply friction
+      ball.vx *= 0.99;
       ball.vy *= 0.99;
     }
   }
@@ -421,43 +518,35 @@ function updatePhysics() {
  * Draws all balls in the game
  */
 function drawBalls() {
-  noStroke();
   for (let ball of balls) {
-    // Special rendering for power-up balls
+    push();
     if (ball.isPowerup) {
-      // Draw sparkle effect
-      push();
-      translate(ball.x, ball.y);
+      // Power-up balls
+      fill(ball.color);
+      stroke(255);
+      strokeWeight(2);
+      circle(ball.x, ball.y, ball.size * 1.2);
+
+      // Add a simple sparkle effect
+      noFill();
+      stroke(255);
+      strokeWeight(1);
       rotate(ball.sparkleAngle);
-      ball.sparkleAngle += 0.05; // Rotate sparkle
-
-      // Draw star shape
-      fill(ball.color);
-      beginShape();
-      for (let i = 0; i < 10; i++) {
-        let radius = i % 2 === 0 ? ball.size : ball.size * 0.5;
-        let angle = (i * TWO_PI) / 10;
-        vertex(cos(angle) * radius, sin(angle) * radius);
-      }
-      endShape(CLOSE);
-
-      // Add glow effect
-      drawingContext.shadowBlur = 10;
-      drawingContext.shadowColor = ball.color;
-      circle(0, 0, ball.size * 0.8);
-      drawingContext.shadowBlur = 0;
-      pop();
+      line(ball.x - ball.size, ball.y, ball.x + ball.size, ball.y);
+      line(ball.x, ball.y - ball.size, ball.x, ball.y + ball.size);
+      ball.sparkleAngle += 0.05;
     } else {
-      // Normal ball rendering
-      fill(ball.color);
+      // Normal balls
+      fill(255); // White fill
       if (ball.selected) {
-        stroke(0);
+        stroke('#ff6b00'); // Orange stroke for selected balls
         strokeWeight(2);
       } else {
         noStroke();
       }
       circle(ball.x, ball.y, ball.size);
     }
+    pop();
   }
 }
 
@@ -466,14 +555,19 @@ function drawBalls() {
  */
 function drawClaw() {
   let actualX = claw.x + sin(claw.angle) * 10;
-  stroke(0);
-  strokeWeight(2);
+  stroke('#ff6b00'); // Change from black (0) to orange
+  strokeWeight(3); // Made slightly thicker for better visibility
+
+  // Draw chain/rope
   line(claw.x, 0, actualX, claw.y);
 
+  // Draw claw parts
   if (claw.open) {
+    // Open claw
     line(actualX - 20, claw.y, actualX - 10, claw.y + 20);
     line(actualX + 20, claw.y, actualX + 10, claw.y + 20);
   } else {
+    // Closed claw
     line(actualX - 15, claw.y, actualX, claw.y + 20);
     line(actualX + 15, claw.y, actualX, claw.y + 20);
   }
@@ -493,6 +587,18 @@ function updateUI() {
  * Handles spacebar input for grabbing and releasing balls
  */
 function keyPressed() {
+  // Enable audio on first key press
+  enableAudio();
+
+  // Start the game on first key press
+  if (!gameStarted) {
+    gameStarted = true;
+    // Reset the timer and last time to start fresh
+    timeLeft = 60;
+    lastTime = millis();
+    return;
+  }
+
   if (key === ' ') {
     if (gameOver) {
       // Reset game
@@ -502,6 +608,11 @@ function keyPressed() {
       level = 1;
       collectedBalls = [];
       resetLevel(level);
+
+      // Restart background music with a slight delay
+      setTimeout(() => {
+        startBackgroundMusic();
+      }, 500);
       return;
     }
 
@@ -605,20 +716,18 @@ function showMessage(text) {
   let messageDiv = document.getElementById('message');
   let messageText = document.getElementById('message-text');
   messageText.innerText = text;
+  messageText.style.fontFamily = "'Press Start 2P', cursive";
   messageDiv.style.display = 'block';
 
-  // Use green background for points, red for lost ball
-  messageDiv.style.backgroundColor = text.includes('+') ? '#d4ffd4' : '#ffebeb';
+  // Use green background for points, orange for lost ball
+  messageDiv.style.backgroundColor = text.includes('+') ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 107, 0, 0.2)';
 
   // Clear any existing timeout
   if (messageDiv.hideTimeout) {
     clearTimeout(messageDiv.hideTimeout);
   }
 
-  // Set timeout duration based on message type
-  let duration = text.includes('+') ? 1000 : 2000; // 1s for points, 2s for lost
-
-  // Auto-hide message after duration
+  let duration = text.includes('+') ? 1000 : 2000;
   messageDiv.hideTimeout = setTimeout(() => {
     messageDiv.style.display = 'none';
   }, duration);
@@ -675,12 +784,42 @@ function updateCollectionDisplay() {
  * Draws the timer and required points
  */
 function drawTimer() {
-  textSize(20);
+  push();
+  setStandardText(clamp(width * 0.04, 18, 24)); // Increased from 0.03 to 0.04, min from 14 to 18, max from 18 to 24
   textAlign(LEFT, TOP);
-  fill(0);
+
+  // Calculate position relative to canvas size
+  let xPos = width * 0.05;
+  let yPos = height * 0.05;
+  let spacing = height * 0.08; // Increased from 0.06 to 0.08 for better spacing with larger text
+
+  // Draw semi-transparent background for better readability
   noStroke();
-  text(`Time: ${timeLeft}s`, 20, 20);
-  text(`Required: ${requiredPoints}`, 20, 45);
+  fill(0, 0, 0, 180);
+  rect(xPos - 15, yPos - 15, width * 0.3, spacing * 2 + 30, 8); // Made background larger to accommodate bigger text
+
+  // Time display with flashing effect when low on time
+  if (timeLeft <= 10) {
+    // Update flash effect
+    timerFlashAlpha += timerFlashDirection * 15;
+    if (timerFlashAlpha >= 255 || timerFlashAlpha <= 0) {
+      timerFlashDirection *= -1;
+    }
+    fill(255, 0, 0, timerFlashAlpha); // Red with flashing
+  } else {
+    fill('#ff6b00'); // Normal orange color
+  }
+  text(`Time: ${timeLeft}s`, xPos, yPos);
+
+  // Required points display with color based on progress
+  let progressColor = score >= requiredPoints ? '#2ecc71' : '#ff6b00'; // Green if met, orange if not
+  fill(progressColor);
+  text(`Required: ${requiredPoints}`, xPos, yPos + spacing);
+
+  // Show current score for comparison
+  fill('#ff6b00');
+  text(`Score: ${score}`, xPos, yPos + spacing * 2);
+  pop();
 }
 
 /**
@@ -701,27 +840,52 @@ function checkLevelCompletion() {
  * Shows game over screen
  */
 function showGameOver() {
-  background(220);
+  // Stop background music with error handling
+  if (backgroundMusic && backgroundMusic.isPlaying()) {
+    try {
+      backgroundMusic.stop();
+      musicStarted = false;
+      console.log('Background music stopped');
+    } catch (e) {
+      console.error('Error stopping background music:', e);
+    }
+  }
+
+  // Draw game over background
+  if (gameOverImg) {
+    // Clear any existing background
+    background(0);
+    // Draw only the game over image
+    image(gameOverImg, 0, 0, width, height);
+  } else {
+    background(0); // Black background as fallback
+  }
+
   let finalScore = totalScore + score;
   let newHighScore = updateHighScore(finalScore);
 
-  textSize(32);
+  // Add semi-transparent overlay to ensure text is readable
+  fill(0, 0, 0, 150);
+  rect(0, height / 2 - 100, width, 220);
+
+  push();
+  setStandardText(24);
   textAlign(CENTER, CENTER);
-  fill(0);
   text('GAME OVER', width / 2, height / 2 - 60);
 
-  textSize(24);
+  setStandardText(16);
   text(`Level ${level} Score: ${score}`, width / 2, height / 2 - 20);
   text(`Total Score: ${finalScore}`, width / 2, height / 2 + 10);
   text(`High Score: ${highScore}`, width / 2, height / 2 + 40);
 
   if (newHighScore) {
-    fill('#FFD700');
+    fill('#2ecc71'); // Keep green for new high score
     text('NEW HIGH SCORE!', width / 2, height / 2 + 70);
   }
 
-  fill(0);
+  fill('#ff6b00');
   text('Press SPACE to restart', width / 2, height / 2 + 100);
+  pop();
 
   playSound('gameOver');
 }
@@ -816,13 +980,14 @@ function showTutorial() {
     "Watch out for power-ups!"
   ];
 
+  push();
   fill(0, 0, 0, 200);
   rect(0, height - 100, width, 100);
 
-  fill(255);
-  textSize(24);
+  setStandardText(clamp(width * 0.02, 10, 14));
   textAlign(CENTER, CENTER);
   text(messages[tutorialStep], width / 2, height - 50);
+  pop();
 
   // Progress tutorial based on actions
   if (tutorialStep === 0 && (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW))) {
@@ -845,13 +1010,12 @@ function drawLevelTransition() {
   if (!isTransitioning) return;
 
   push();
-  background(220);
+  background(0);
   fill(0, 0, 0, transitionAlpha);
   rect(0, 0, width, height);
 
   if (transitionAlpha > 0) {
-    fill(255);
-    textSize(48);
+    setStandardText(32);
     textAlign(CENTER, CENTER);
     text(`Level ${level}`, width / 2, height / 2);
   }
@@ -881,10 +1045,9 @@ function playSound(soundName) {
 // New function to show active power-ups
 function drawPowerupStatus() {
   let y = 70;
+  push();
+  setStandardText(clamp(width * 0.02, 10, 14));
   textAlign(LEFT, TOP);
-  textSize(16);
-  fill(0);
-  noStroke();
 
   Object.entries(activePowerups).forEach(([type, active]) => {
     if (active) {
@@ -893,4 +1056,83 @@ function drawPowerupStatus() {
       y += 20;
     }
   });
+  pop();
+}
+
+// Add this new function to handle music start
+function startBackgroundMusic() {
+  if (backgroundMusic && soundsEnabled && !musicStarted && userInteracted) {
+    try {
+      console.log('Attempting to start background music...');
+      backgroundMusic.setVolume(0.4);
+      backgroundMusic.loop();
+      musicStarted = true;
+      console.log('Background music started successfully');
+    } catch (e) {
+      console.error('Error starting background music:', e);
+    }
+  } else {
+    console.log('Music not started because:', {
+      musicExists: !!backgroundMusic,
+      soundEnabled: soundsEnabled,
+      alreadyStarted: musicStarted,
+      userHasInteracted: userInteracted
+    });
+  }
+}
+
+// Simplify the enableAudio function
+function enableAudio() {
+  if (!userInteracted) {
+    userInteracted = true;
+    soundsEnabled = true;
+
+    // Hide only the audio message
+    const audioMessage = document.getElementById('audio-message');
+    if (audioMessage) audioMessage.style.display = 'none';
+
+    // Start background music if it's loaded
+    if (backgroundMusic) {
+      try {
+        getAudioContext().resume().then(() => {
+          console.log('Audio context resumed');
+          backgroundMusic.setVolume(0.4);
+          backgroundMusic.loop();
+          musicStarted = true;
+          console.log('Background music started after user interaction');
+        });
+      } catch (e) {
+        console.error('Error starting background music:', e);
+      }
+    }
+  }
+}
+
+// Add this function to handle audio context
+function touchStarted() {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
+  return false;
+}
+
+// Add this function to handle mouse clicks
+function mousePressed() {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
+  return false;
+}
+
+// Add this function at the top to standardize text styling
+function setStandardText(size = 12) {
+  textFont('Press Start 2P');
+  textSize(size);
+  fill('#ff6b00'); // Orange color to match instructions
+  noStroke();
+}
+
+// Helper function for responsive text sizing
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 } 

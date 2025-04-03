@@ -7,8 +7,11 @@
     <title>Fang & Claw: A Grabby Situation</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="data:,">
+    <link rel="icon" type="image/png" href="images/dracula.png">
 </head>
 
 <body>
@@ -16,8 +19,8 @@
         <div class="controls panel">
             <h3>How to Play</h3>
             <ul>
-                <li>← → Arrow Keys: Move claw left/right</li>
-                <li>↑ ↓ Arrow Keys: Move claw up/down</li>
+                <li>⬅️ ➡️ Arrow Keys: Move claw left/right</li>
+                <li>⬆️ ⬇️ Arrow Keys: Move claw up/down</li>
                 <li>Space: Open/Close claw to grab balls</li>
                 <li>Warning: Balls might slip away at the top!</li>
             </ul>
@@ -45,6 +48,8 @@
         <span class="close-btn" onclick="closeMessage()">×</span>
         <p id="message-text"></p>
     </div>
+
+    <div class="game-container"></div>
 
     <script src="sketch.js"></script>
 </body>

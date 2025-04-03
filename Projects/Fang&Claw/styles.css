@@ -1,32 +1,58 @@
 /* Base styles */
 body {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     height: 100vh;
+    width: 100vw;
     margin: 0;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2vw;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    font-family: 'Press Start 2P', cursive;
     overflow: hidden;
+    font-size: 12px;
+    color: #ff6b00;
 }
 
 /* Left sidebar container */
 .sidebar {
     position: fixed;
-    left: 20px;
-    top: 20px;
-    height: calc(100vh - 40px);
+    left: 2vw;
+    top: 2vh;
+    height: 96vh;
+    width: 20vw;
+    /* Reduced width */
+    min-width: 250px;
+    max-width: 350px;
     display: flex;
     flex-direction: column;
     gap: 0;
+    z-index: 2;
 }
 
 /* Game canvas positioning */
 canvas {
     position: fixed !important;
-    left: 520px !important;
-    right: 20px !important;
-    top: 20px !important;
+    left: calc(22vw + 2vw) !important;
+    /* sidebar width + gap */
+    top: 2vh !important;
+    width: calc(76vw - 2vw) !important;
+    /* Remaining width minus padding */
+    height: 96vh !important;
+    object-fit: contain !important;
+}
+
+/* Game container to center canvas */
+.game-container {
+    position: fixed;
+    left: calc(22vw + 2vw);
+    top: 2vh;
+    width: calc(76vw - 2vw);
+    height: 96vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Common panel styling */
@@ -34,14 +60,15 @@ canvas {
     position: relative;
     width: 100%;
     margin: 0;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 15px 20px;
-    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 1.5vh 1.5vw;
+    border-radius: 0;
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid #ff6b00;
+    color: #ff6b00;
 }
 
-/* Add connecting borders */
+/* Remove rounded corners from panel connections */
 .panel+.panel {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -57,16 +84,19 @@ canvas {
 .controls {
     position: relative;
     width: 100%;
+    border-radius: 0;
+    font-size: clamp(10px, 1vw, 14px);
 }
 
 /* Make all panel headers consistent */
 .panel h3 {
     margin-top: 0;
-    margin-bottom: 15px;
-    color: #2c3e50;
-    font-size: 1.3em;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 8px;
+    margin-bottom: 1.5vh;
+    color: #ff6b00;
+    font-size: clamp(12px, 1.2vw, 16px);
+    border-bottom: 2px solid #9b59b6;
+    padding-bottom: 0.8vh;
+    letter-spacing: 1px;
 }
 
 /* Remove the specific h3 styles from controls */
@@ -77,44 +107,47 @@ canvas {
 
 .controls ul {
     margin: 0;
-    padding-left: 20px;
+    padding-left: 1.5vw;
     list-style-type: none;
 }
 
 .controls li {
-    margin-bottom: 10px;
-    padding-left: 20px;
+    margin-bottom: 1.5vh;
+    padding-left: 1.5vw;
     position: relative;
+    line-height: 1.4;
 }
 
 .controls li::before {
     content: '•';
     position: absolute;
     left: 0;
-    color: #3498db;
+    color: #2ecc71;
+    /* Green */
 }
 
 /* Score display - remove fixed positioning */
 .score-display {
-    position: relative;
-    width: 100%;
-    text-align: center;
+    flex-grow: 1;
+    min-height: 15vh;
 }
 
 .score-value {
     font-weight: bold;
-    color: #2c3e50;
+    color: #ff6b00;
+    /* Orange */
     margin: 10px 0;
 }
 
 .level-value {
-    color: #3498db;
+    color: #9b59b6;
+    /* Purple */
 }
 
 /* Collection area - remove fixed positioning */
 .collection-area {
-    position: relative;
-    width: 100%;
+    flex-grow: 1;
+    min-height: 15vh;
 }
 
 /* Collection display */
@@ -132,20 +165,29 @@ canvas {
 .message {
     position: fixed;
     top: 50%;
-    left: calc(460px + ((100vw - 480px) / 2));
+    left: calc(22vw + 2vw + ((76vw - 2vw) / 2));
     transform: translate(-50%, -50%);
     z-index: 1000;
+    width: 25vw;
+    min-width: 250px;
+    max-width: 400px;
     display: none;
-    width: 300px;
     text-align: center;
     padding: 15px 25px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid #ff6b00;
 }
 
 .message p {
     margin: 10px 0;
-    font-size: 1.2em;
-    color: #2c3e50;
+    font-size: 12px;
+    /* Consistent pixel font size */
+    font-family: 'Press Start 2P', cursive;
+    color: #ff6b00;
     word-wrap: break-word;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    /* More arcade-like */
 }
 
 .close-btn {
@@ -158,13 +200,15 @@ canvas {
     line-height: 25px;
     text-align: center;
     border-radius: 50%;
-    background: #e74c3c;
-    color: white;
+    background: #9b59b6;
+    /* Purple */
+    color: #000000;
     font-weight: bold;
 }
 
 .close-btn:hover {
-    background: #c0392b;
+    background: #8e44ad;
+    /* Darker purple */
 }
 
 /* Color points styling */
@@ -185,8 +229,8 @@ canvas {
 .ball-count {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 5px;
+    gap: 1vh;
+    padding: 0.5vh;
 }
 
 .ball-type {
@@ -195,7 +239,9 @@ canvas {
     gap: 8px;
     padding: 5px;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #2ecc71;
+    /* Green border */
 }
 
 .ball-color {
@@ -205,6 +251,18 @@ canvas {
 }
 
 .ball-amount {
-    font-weight: bold;
-    color: #2c3e50;
+    font-weight: normal;
+    /* Pixel fonts usually don't need bold */
+    color: #ff6b00;
+    /* Orange */
+    font-size: 0.9em;
+}
+
+/* Update audio message position */
+#audio-message {
+    position: fixed;
+    top: 45%;
+    left: calc(22vw + 2vw + ((76vw - 2vw) / 2));
+    transform: translateX(-50%);
+    z-index: 9999;
 }
