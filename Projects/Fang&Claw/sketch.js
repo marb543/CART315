@@ -81,6 +81,19 @@ let activePowerups = {
 };
 
 // Game state flags
+let gameState = 'TITLE'; // 'TITLE', 'STORY', 'TUTORIAL', 'PLAYING', 'GAMEOVER'
+let storyPage = 0;
+let storyText = [
+  "In a dimly lit arcade at the edge of Transylvania...",
+  "Count Vladislav the Third finds himself in quite the predicament.",
+  "His pet bats have escaped their cozy coffin-cages!",
+  "Too embarrassed to chase them traditionally...",
+  "He discovers a peculiar claw machine in the corner.",
+  "'Ah-ha! Perfect for a vampire of my sophistication!'",
+  "Now he must catch his mischievous bats...",
+  "...using this mortal contraption of entertainment!",
+  "'How hard could it be? I've been alive for centuries!'"
+];
 let isTutorial = true;
 let tutorialStep = 0;
 let isTransitioning = false;
@@ -98,6 +111,9 @@ let musicStarted = false;
 let gameStarted = false;
 let timerFlashAlpha = 0;
 let timerFlashDirection = 1;
+let draculaImg;
+let starterImg;
+let dialogueImg;
 
 /***********************************
  * GAME INITIALIZATION
@@ -128,11 +144,50 @@ function preload() {
         assetsLoaded++;
       }
     );
+
+    draculaImg = loadImage('images/dracula.png',
+      () => {
+        console.log('Dracula image loaded successfully');
+        assetsLoaded++;
+      },
+      () => {
+        console.error('Failed to load dracula image');
+        draculaImg = null;
+        assetsLoaded++;
+      }
+    );
+
+    starterImg = loadImage('images/starter_image.png',
+      () => {
+        console.log('Starter image loaded successfully');
+        assetsLoaded++;
+      },
+      () => {
+        console.error('Failed to load starter image');
+        starterImg = null;
+        assetsLoaded++;
+      }
+    );
+
+    dialogueImg = loadImage('images/dialogue.png',
+      () => {
+        console.log('Dialogue image loaded successfully');
+        assetsLoaded++;
+      },
+      () => {
+        console.error('Failed to load dialogue image');
+        dialogueImg = null;
+        assetsLoaded++;
+      }
+    );
   } catch (e) {
     console.error('Error loading images:', e);
     backgroundImg = null;
     gameOverImg = null;
-    assetsLoaded += 2;
+    draculaImg = null;
+    starterImg = null;
+    dialogueImg = null;
+    assetsLoaded += 5;
   }
 
   if (window.AudioContext || window.webkitAudioContext) {
@@ -366,64 +421,125 @@ function getCurrentDifficulty() {
  * 5. Updates UI and score display
  */
 function draw() {
-  if (!gameStarted) {
-    // Show waiting screen
+  if (gameState === 'TITLE') {
+    drawTitleScreen();
+  } else if (gameState === 'STORY') {
+    drawStoryScreen();
+  } else if (gameState === 'PLAYING') {
+    // Clear the background first
     background(0);
-    push();
-    setStandardText(16);
-    textAlign(CENTER, CENTER);
-    text('PRESS ANY KEY TO START', width / 2, height / 2);
-    pop();
-    return;
-  }
 
-  if (gameOver) {
-    showGameOver();
-    return;
-  }
-
-  if (isTutorial) {
-    showTutorial();
-  }
-
-  if (isTransitioning) {
-    drawLevelTransition();
-    return;
-  }
-
-  // Draw background
-  if (backgroundImg) {
-    // Draw the background image
-    image(backgroundImg, 10, 10, width - 20, height - 20);
-  } else {
-    // Fallback to black background if image fails to load
-    background(0);
-  }
-
-  // Draw game border
-  stroke('#ff6b00'); // Orange border
-  strokeWeight(4);
-  noFill();
-  rect(10, 10, width - 20, height - 20);
-
-  // Update timer
-  let currentTime = millis();
-  if (currentTime - lastTime >= 1000) {
-    timeLeft--;
-    lastTime = currentTime;
-
-    // Check for time up
-    if (timeLeft <= 0) {
-      checkLevelCompletion();
+    if (gameOver) {
+      showGameOver();
+      return;
     }
+
+    if (isTutorial) {
+      showTutorial();
+    }
+
+    if (isTransitioning) {
+      drawLevelTransition();
+      return;
+    }
+
+    // Draw game background
+    if (backgroundImg) {
+      image(backgroundImg, 10, 10, width - 20, height - 20);
+    }
+
+    // Draw game border
+    stroke('#ff6b00'); // Orange border
+    strokeWeight(4);
+    noFill();
+    rect(10, 10, width - 20, height - 20);
+
+    // Update timer
+    let currentTime = millis();
+    if (currentTime - lastTime >= 1000) {
+      timeLeft--;
+      lastTime = currentTime;
+
+      if (timeLeft <= 0) {
+        checkLevelCompletion();
+      }
+    }
+
+    handleClawMovement();
+    updatePhysics();
+    drawBalls();
+    drawClaw();
+    updateUI();
+    drawTimer();
+  }
+}
+
+function drawTitleScreen() {
+  background(0);
+  push();
+
+  // Load and draw starter image to fill the screen
+  if (starterImg) {
+    // Fill the entire canvas while maintaining aspect ratio
+    let imgRatio = starterImg.width / starterImg.height;
+    let canvasRatio = width / height;
+    let imgWidth, imgHeight;
+
+    if (canvasRatio > imgRatio) {
+      // Canvas is wider than image
+      imgWidth = width;
+      imgHeight = width / imgRatio;
+    } else {
+      // Canvas is taller than image
+      imgHeight = height;
+      imgWidth = height * imgRatio;
+    }
+
+    // Center the image
+    let x = (width - imgWidth) / 2;
+    let y = (height - imgHeight) / 2;
+
+    image(starterImg, x, y, imgWidth, imgHeight);
   }
 
-  handleClawMovement();
-  updatePhysics();
-  drawBalls();
-  drawClaw();
-  updateUI();
-  drawTimer();
+  pop();
+}
+
+function drawStoryScreen() {
+  // Set background to match the dark navy/indigo color from the dialogue image
+  background('#1a1b2f');
+  push();
+
+  // Load and draw dialogue image
+  if (dialogueImg) {
+    // Calculate dimensions that preserve aspect ratio and fit within 80% of the canvas height
+    let maxHeight = height * 0.8;
+    let imgRatio = dialogueImg.width / dialogueImg.height;
+    let imgHeight = maxHeight;
+    let imgWidth = imgHeight * imgRatio;
+
+    // If width is too large, scale down based on width
+    if (imgWidth > width * 0.9) {
+      imgWidth = width * 0.9;
+      imgHeight = imgWidth / imgRatio;
+    }
+
+    // Center the image horizontally and vertically
+    let x = (width - imgWidth) / 2;
+    let y = (height - imgHeight) / 2;
+
+    // Draw orange border
+    stroke('#ff6b00');
+    strokeWeight(4);
+    noFill();
+    // Draw rectangle slightly larger than the image
+    rect(x - 10, y - 10, imgWidth + 20, imgHeight + 20, 5);
+
+    // Draw the image with calculated dimensions
+    image(dialogueImg, x, y, imgWidth, imgHeight);
+  }
+
+  pop();
 }
 
 /***********************************
@@ -587,42 +703,35 @@ function updateUI() {
  * Handles spacebar input for grabbing and releasing balls
  */
 function keyPressed() {
-  // Enable audio on first key press
-  enableAudio();
-
-  // Start the game on first key press
-  if (!gameStarted) {
-    gameStarted = true;
-    // Reset the timer and last time to start fresh
-    timeLeft = 60;
-    lastTime = millis();
-    return;
-  }
-
   if (key === ' ') {
-    if (gameOver) {
-      // Reset game
-      gameOver = false;
-      score = 0;
-      totalScore = 0;
-      level = 1;
-      collectedBalls = [];
-      resetLevel(level);
-
-      // Restart background music with a slight delay
-      setTimeout(() => {
-        startBackgroundMusic();
-      }, 500);
+    if (gameState === 'TITLE') {
+      gameState = 'STORY';
       return;
     }
 
-    // Normal spacebar handling for claw
-    claw.open = !claw.open;
-    if (claw.open && claw.y <= 50 && selectedBalls.length > 0) {
-      handleBallCollection();
+    if (gameState === 'STORY') {
+      gameState = 'PLAYING';
+      gameStarted = true;
+      enableAudio();
+      lastTime = millis();
+      resetLevel(level);
+      return;
     }
-    if (!claw.open) {
-      grabNearbyBalls();
+
+    // Gameplay controls
+    if (gameState === 'PLAYING') {
+      if (gameOver) {
+        resetGame();
+        return;
+      }
+
+      if (claw.open) {
+        claw.open = false;
+        grabNearbyBalls();
+      } else {
+        claw.open = true;
+        handleBallCollection();
+      }
     }
   }
 }
@@ -1135,4 +1244,35 @@ function setStandardText(size = 12) {
 // Helper function for responsive text sizing
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function resetGame() {
+  gameState = 'TITLE';
+  storyPage = 0;
+  gameOver = false;
+  score = 0;
+  totalScore = 0;
+  level = 1;
+  collectedBalls = [];
+  resetLevel(level);
+}
+
+// Add new function to draw speech bubble
+function drawSpeechBubble(x, y, w, h, radius) {
+  push();
+  fill(255, 255, 255, 200); // Changed to white with some transparency
+  stroke(255); // Changed to white
+  strokeWeight(2);
+
+  // Main bubble
+  rect(x, y - h / 2, w, h, radius);
+
+  // Pointer towards Dracula
+  beginShape();
+  vertex(x, y);
+  vertex(x - 30, y);
+  vertex(x, y - 30);
+  endShape(CLOSE);
+
+  pop();
 } 
