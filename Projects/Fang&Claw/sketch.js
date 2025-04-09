@@ -50,19 +50,19 @@ let sounds = {
 const POWERUP_TYPES = {
   MAGNET: {
     color: '#9b59b6',
-    duration: 5000,
+    duration: 15000,    // Increased to 15 seconds
     description: 'Magnetic Claw',
     effect: () => { claw.size *= 1.5; }
   },
   DOUBLE_POINTS: {
     color: '#ff6b00',
-    duration: 10000,
+    duration: 20000,   // Increased to 20 seconds
     description: '2x Points',
     effect: () => { }
   },
   SLOW_TIME: {
     color: '#2ecc71',
-    duration: 8000,
+    duration: 15000,   // Increased to 15 seconds
     description: 'Slow Motion',
     effect: () => {
       for (let ball of balls) {
@@ -83,17 +83,6 @@ let activePowerups = {
 // Game state flags
 let gameState = 'TITLE'; // 'TITLE', 'STORY', 'TUTORIAL', 'PLAYING', 'GAMEOVER'
 let storyPage = 0;
-let storyText = [
-  "In a dimly lit arcade at the edge of Transylvania...",
-  "Count Vladislav the Third finds himself in quite the predicament.",
-  "His pet bats have escaped their cozy coffin-cages!",
-  "Too embarrassed to chase them traditionally...",
-  "He discovers a peculiar claw machine in the corner.",
-  "'Ah-ha! Perfect for a vampire of my sophistication!'",
-  "Now he must catch his mischievous bats...",
-  "...using this mortal contraption of entertainment!",
-  "'How hard could it be? I've been alive for centuries!'"
-];
 let isTutorial = true;
 let tutorialStep = 0;
 let isTransitioning = false;
@@ -113,7 +102,19 @@ let timerFlashAlpha = 0;
 let timerFlashDirection = 1;
 let draculaImg;
 let starterImg;
-let dialogueImg;
+let dialogueImages = [];
+let currentDialogue = 0;
+let totalDialogues = 6;
+
+// Add these variables at the top with other global variables
+let batImages = {
+  red: 'images/red_bat.png',
+  blue: 'images/blue_bat.png',
+  yellow: 'images/yellow_bat.png',
+  green: 'images/green_bat.png',
+  purple: 'images/purple_bat.png',
+  orange: 'images/orange_bat.png'
+};
 
 /***********************************
  * GAME INITIALIZATION
@@ -169,25 +170,100 @@ function preload() {
       }
     );
 
-    dialogueImg = loadImage('images/dialogue.png',
-      () => {
-        console.log('Dialogue image loaded successfully');
-        assetsLoaded++;
-      },
-      () => {
-        console.error('Failed to load dialogue image');
-        dialogueImg = null;
-        assetsLoaded++;
-      }
-    );
+    // Load all dialogue images
+    for (let i = 1; i <= totalDialogues; i++) {
+      dialogueImages[i - 1] = loadImage(`images/dialogue${i}.png`,
+        () => {
+          console.log(`Dialogue ${i} image loaded successfully`);
+          assetsLoaded++;
+        },
+        () => {
+          console.error(`Failed to load dialogue ${i} image`);
+          dialogueImages[i - 1] = null;
+          assetsLoaded++;
+        }
+      );
+    }
+
+    // Load bat images
+    try {
+      batImages.red = loadImage('images/red_bat.png',
+        () => {
+          console.log('Red bat image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load red bat image');
+          assetsLoaded++;
+        }
+      );
+
+      batImages.blue = loadImage('images/blue_bat.png',
+        () => {
+          console.log('Blue bat image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load blue bat image');
+          assetsLoaded++;
+        }
+      );
+
+      batImages.yellow = loadImage('images/yellow_bat.png',
+        () => {
+          console.log('Yellow bat image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load yellow bat image');
+          assetsLoaded++;
+        }
+      );
+
+      batImages.green = loadImage('images/green_bat.png',
+        () => {
+          console.log('Green bat image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load green bat image');
+          assetsLoaded++;
+        }
+      );
+
+      batImages.purple = loadImage('images/purple_bat.png',
+        () => {
+          console.log('Purple bat image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load purple bat image');
+          assetsLoaded++;
+        }
+      );
+
+      batImages.orange = loadImage('images/orange_bat.png',
+        () => {
+          console.log('Orange bat image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load orange bat image');
+          assetsLoaded++;
+        }
+      );
+    } catch (e) {
+      console.error('Error loading bat images:', e);
+      assetsLoaded += 5; // Count all bat images as loaded even if they failed
+    }
   } catch (e) {
     console.error('Error loading images:', e);
     backgroundImg = null;
     gameOverImg = null;
     draculaImg = null;
     starterImg = null;
-    dialogueImg = null;
-    assetsLoaded += 5;
+    dialogueImages = Array(totalDialogues).fill(null);
+    assetsLoaded += 5 + totalDialogues;
   }
 
   if (window.AudioContext || window.webkitAudioContext) {
@@ -338,7 +414,7 @@ function resetLevel(currentLevel) {
       x: random(50, width - 50),
       y: random(100, height - 50),
       color: random(colors),
-      size: 30,
+      size: 120,
       selected: false,
       vx: random(-baseVelocity, baseVelocity),
       vy: random(-baseVelocity, baseVelocity),
@@ -349,7 +425,7 @@ function resetLevel(currentLevel) {
   claw = {
     x: width / 2,
     y: 50,
-    size: 40,
+    size: 160,
     open: true,
     speed: gameLevel[getCurrentDifficulty()].speed,
     angle: 0,
@@ -506,15 +582,15 @@ function drawTitleScreen() {
 }
 
 function drawStoryScreen() {
-  // Set background to match the dark navy/indigo color from the dialogue image
+  // Set background to match the dark navy/indigo color
   background('#1a1b2f');
   push();
 
-  // Load and draw dialogue image
-  if (dialogueImg) {
+  // Load and draw current dialogue image
+  if (dialogueImages[currentDialogue]) {
     // Calculate dimensions that preserve aspect ratio and fit within 80% of the canvas height
     let maxHeight = height * 0.8;
-    let imgRatio = dialogueImg.width / dialogueImg.height;
+    let imgRatio = dialogueImages[currentDialogue].width / dialogueImages[currentDialogue].height;
     let imgHeight = maxHeight;
     let imgWidth = imgHeight * imgRatio;
 
@@ -532,11 +608,10 @@ function drawStoryScreen() {
     stroke('#ff6b00');
     strokeWeight(4);
     noFill();
-    // Draw rectangle slightly larger than the image
     rect(x - 10, y - 10, imgWidth + 20, imgHeight + 20, 5);
 
     // Draw the image with calculated dimensions
-    image(dialogueImg, x, y, imgWidth, imgHeight);
+    image(dialogueImages[currentDialogue], x, y, imgWidth, imgHeight);
   }
 
   pop();
@@ -637,30 +712,53 @@ function drawBalls() {
   for (let ball of balls) {
     push();
     if (ball.isPowerup) {
-      // Power-up balls
-      fill(ball.color);
-      stroke(255);
-      strokeWeight(2);
-      circle(ball.x, ball.y, ball.size * 1.2);
+      // Check if it's the Double Points power-up (orange)
+      if (ball.powerupType === 'DOUBLE_POINTS') {
+        imageMode(CENTER);
+        if (ball.selected) {
+          tint(255, 255, 255, 200);
+          image(batImages.orange, ball.x, ball.y, ball.size * 1.2, ball.size * 1.2);
+          noTint();
+        } else {
+          image(batImages.orange, ball.x, ball.y, ball.size, ball.size);
+        }
 
-      // Add a simple sparkle effect
-      noFill();
-      stroke(255);
-      strokeWeight(1);
-      rotate(ball.sparkleAngle);
-      line(ball.x - ball.size, ball.y, ball.x + ball.size, ball.y);
-      line(ball.x, ball.y - ball.size, ball.x, ball.y + ball.size);
-      ball.sparkleAngle += 0.05;
-    } else {
-      // Normal balls
-      fill(255); // White fill
-      if (ball.selected) {
-        stroke('#ff6b00'); // Orange stroke for selected balls
-        strokeWeight(2);
+        // Add sparkle effect
+        noFill();
+        stroke(255);
+        strokeWeight(1);
+        rotate(ball.sparkleAngle);
+        line(ball.x - ball.size, ball.y, ball.x + ball.size, ball.y);
+        line(ball.x, ball.y - ball.size, ball.x, ball.y + ball.size);
+        ball.sparkleAngle += 0.05;
       } else {
-        noStroke();
+        // Other power-up balls remain as circles
+        fill(ball.color);
+        stroke(255);
+        strokeWeight(2);
+        circle(ball.x, ball.y, ball.size * 1.2);
+
+        // Add sparkle effect
+        noFill();
+        stroke(255);
+        strokeWeight(1);
+        rotate(ball.sparkleAngle);
+        line(ball.x - ball.size, ball.y, ball.x + ball.size, ball.y);
+        line(ball.x, ball.y - ball.size, ball.x, ball.y + ball.size);
+        ball.sparkleAngle += 0.05;
       }
-      circle(ball.x, ball.y, ball.size);
+    } else {
+      // Regular bats
+      if (batImages[ball.color]) {
+        imageMode(CENTER);
+        if (ball.selected) {
+          tint(255, 255, 255, 200);
+          image(batImages[ball.color], ball.x, ball.y, ball.size * 1.2, ball.size * 1.2);
+          noTint();
+        } else {
+          image(batImages[ball.color], ball.x, ball.y, ball.size, ball.size);
+        }
+      }
     }
     pop();
   }
@@ -696,7 +794,6 @@ function updateUI() {
   document.getElementById('score-display').textContent = score;
   document.getElementById('level-display').textContent = level;
   updateCollectionDisplay();
-  drawPowerupStatus();
 }
 
 /**
@@ -710,11 +807,15 @@ function keyPressed() {
     }
 
     if (gameState === 'STORY') {
-      gameState = 'PLAYING';
-      gameStarted = true;
-      enableAudio();
-      lastTime = millis();
-      resetLevel(level);
+      currentDialogue++;
+      if (currentDialogue >= totalDialogues) {
+        // When we've shown all dialogues, start the game
+        gameState = 'PLAYING';
+        gameStarted = true;
+        enableAudio();
+        lastTime = millis();
+        resetLevel(level);
+      }
       return;
     }
 
@@ -741,15 +842,21 @@ function keyPressed() {
  */
 function handleBallCollection() {
   let difficulty = getCurrentDifficulty();
+  let isNearTop = claw.y <= 100;
 
-  for (let ball of selectedBalls) {
-    if (random() < gameLevel[difficulty].dropChance) {
+  // Create a copy of selectedBalls to avoid modification during iteration
+  let ballsToProcess = [...selectedBalls];
+  selectedBalls = []; // Clear the array immediately
+
+  for (let ball of ballsToProcess) {
+    if (!isNearTop) {
+      dropBall(ball);
+    } else if (random() < gameLevel[difficulty].dropChance) {
       dropBall(ball);
     } else {
       collectBall(ball);
     }
   }
-  selectedBalls = [];
 
   if (balls.length === 0) {
     level++;
@@ -766,12 +873,18 @@ function dropBall(ball) {
   ball.selected = false;
   ball.vy = 2;
   ball.vx = random(-2, 2);
-  let index = selectedBalls.indexOf(ball);
-  if (index > -1) {
-    selectedBalls.splice(index, 1);
+
+  // Make sure the ball is still in the balls array
+  if (!balls.includes(ball)) {
+    balls.push(ball);
   }
+
   playSound('drop');
-  showMessage('lost');
+  if (claw.y > 100) {
+    showMessage('TOO LOW!');
+  } else {
+    showMessage('LOST');
+  }
 }
 
 /**
@@ -779,26 +892,28 @@ function dropBall(ball) {
  * @param {Object} ball - The ball to collect
  */
 function collectBall(ball) {
-  if (ball.isPowerup) {
-    activatePowerup(ball.powerupType);
-  }
-
-  // Apply double points if powerup is active
-  let pointMultiplier = activePowerups.DOUBLE_POINTS ? 2 : 1;
-  score += ball.value * pointMultiplier;
-
-  collectedBalls.push({
-    color: ball.color,
-    size: ball.size
-  });
-
+  // Immediately remove the ball from the game world
   let ballIndex = balls.indexOf(ball);
   if (ballIndex > -1) {
     balls.splice(ballIndex, 1);
   }
 
-  playSound('collect');
-  showMessage(`+${ball.value * pointMultiplier}`);
+  if (ball.isPowerup) {
+    activatePowerup(ball.powerupType);
+    let powerup = POWERUP_TYPES[ball.powerupType];
+    let duration = powerup.duration / 1000;
+    showMessage(`${powerup.description} ACTIVATED!\n(${duration}s)`, true);
+    playSound('collect');
+  } else {
+    let pointMultiplier = activePowerups.DOUBLE_POINTS ? 2 : 1;
+    score += ball.value * pointMultiplier;
+    collectedBalls.push({
+      color: ball.color,
+      size: ball.size
+    });
+    playSound('collect');
+    showMessage(`+${ball.value * pointMultiplier}`);
+  }
 }
 
 /**
@@ -821,22 +936,27 @@ function grabNearbyBalls() {
  * Shows a message popup
  * @param {string} text - The message to show
  */
-function showMessage(text) {
+function showMessage(text, isPowerup = false) {
   let messageDiv = document.getElementById('message');
   let messageText = document.getElementById('message-text');
   messageText.innerText = text;
   messageText.style.fontFamily = "'Press Start 2P', cursive";
   messageDiv.style.display = 'block';
 
-  // Use green background for points, orange for lost ball
-  messageDiv.style.backgroundColor = text.includes('+') ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 107, 0, 0.2)';
+  // Use different background colors based on message type
+  if (isPowerup) {
+    messageDiv.style.backgroundColor = 'rgba(155, 89, 182, 0.2)'; // Purple for power-ups
+  } else {
+    messageDiv.style.backgroundColor = text.includes('+') ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 107, 0, 0.2)';
+  }
 
   // Clear any existing timeout
   if (messageDiv.hideTimeout) {
     clearTimeout(messageDiv.hideTimeout);
   }
 
-  let duration = text.includes('+') ? 1000 : 2000;
+  // Power-up messages show for 2 seconds, points for 1 second, lost for 2 seconds
+  let duration = isPowerup ? 2000 : (text.includes('+') ? 1000 : 2000);
   messageDiv.hideTimeout = setTimeout(() => {
     messageDiv.style.display = 'none';
   }, duration);
@@ -873,15 +993,18 @@ function updateCollectionDisplay() {
     const ballType = document.createElement('div');
     ballType.className = 'ball-type';
 
-    const colorDot = document.createElement('div');
-    colorDot.className = 'ball-color';
-    colorDot.style.backgroundColor = color;
+    // Create an img element for the bat
+    const batImg = document.createElement('img');
+    batImg.src = `images/${color}_bat.png`; // Use the correct path to your bat images
+    batImg.className = 'bat-image';
+    batImg.width = 30;
+    batImg.height = 30;
 
     const amount = document.createElement('span');
     amount.className = 'ball-amount';
     amount.textContent = `${count}x`;
 
-    ballType.appendChild(colorDot);
+    ballType.appendChild(batImg);
     ballType.appendChild(amount);
     countDisplay.appendChild(ballType);
   });
@@ -894,22 +1017,27 @@ function updateCollectionDisplay() {
  */
 function drawTimer() {
   push();
-  setStandardText(clamp(width * 0.04, 18, 24)); // Increased from 0.03 to 0.04, min from 14 to 18, max from 18 to 24
-  textAlign(LEFT, TOP);
+  setStandardText(clamp(width * 0.03, 16, 20)); // Slightly smaller font for fitting all text
+  textAlign(CENTER, BOTTOM); // Align text center and bottom
 
-  // Calculate position relative to canvas size
-  let xPos = width * 0.05;
-  let yPos = height * 0.05;
-  let spacing = height * 0.08; // Increased from 0.06 to 0.08 for better spacing with larger text
+  // Calculate position at the bottom of the screen
+  let yPos = height - 20; // 20 pixels from bottom
 
   // Draw semi-transparent background for better readability
   noStroke();
   fill(0, 0, 0, 180);
-  rect(xPos - 15, yPos - 15, width * 0.3, spacing * 2 + 30, 8); // Made background larger to accommodate bigger text
+  rect(10, yPos - 30, width - 20, 40, 8); // Background rectangle for text
 
-  // Time display with flashing effect when low on time
+  // Combine all information in one line with spacing
+  let timeText = `TIME: ${timeLeft}s`;
+  let requiredText = `REQUIRED: ${requiredPoints}`;
+  let scoreText = `SCORE: ${score}`;
+
+  // Calculate spacing between elements
+  let spacing = width / 4;
+
+  // Draw time with flashing effect when low
   if (timeLeft <= 10) {
-    // Update flash effect
     timerFlashAlpha += timerFlashDirection * 15;
     if (timerFlashAlpha >= 255 || timerFlashAlpha <= 0) {
       timerFlashDirection *= -1;
@@ -918,16 +1046,16 @@ function drawTimer() {
   } else {
     fill('#ff6b00'); // Normal orange color
   }
-  text(`Time: ${timeLeft}s`, xPos, yPos);
+  text(timeText, spacing, yPos);
 
-  // Required points display with color based on progress
-  let progressColor = score >= requiredPoints ? '#2ecc71' : '#ff6b00'; // Green if met, orange if not
-  fill(progressColor);
-  text(`Required: ${requiredPoints}`, xPos, yPos + spacing);
+  // Draw required points
+  fill(score >= requiredPoints ? '#2ecc71' : '#ff6b00'); // Green if met, orange if not
+  text(requiredText, width / 2, yPos);
 
-  // Show current score for comparison
+  // Draw score
   fill('#ff6b00');
-  text(`Score: ${score}`, xPos, yPos + spacing * 2);
+  text(scoreText, width - spacing, yPos);
+
   pop();
 }
 
@@ -1046,9 +1174,6 @@ function activatePowerup(type) {
     powerup.effect();
   }
 
-  // Show visual feedback
-  showMessage(`${powerup.description} ACTIVATED!`);
-
   // Set up expiration
   setTimeout(() => {
     deactivatePowerup(type);
@@ -1151,23 +1276,6 @@ function playSound(soundName) {
   }
 }
 
-// New function to show active power-ups
-function drawPowerupStatus() {
-  let y = 70;
-  push();
-  setStandardText(clamp(width * 0.02, 10, 14));
-  textAlign(LEFT, TOP);
-
-  Object.entries(activePowerups).forEach(([type, active]) => {
-    if (active) {
-      fill(POWERUP_TYPES[type].color);
-      text(`${POWERUP_TYPES[type].description} ACTIVE`, 20, y);
-      y += 20;
-    }
-  });
-  pop();
-}
-
 // Add this new function to handle music start
 function startBackgroundMusic() {
   if (backgroundMusic && soundsEnabled && !musicStarted && userInteracted) {
@@ -1248,7 +1356,7 @@ function clamp(value, min, max) {
 
 function resetGame() {
   gameState = 'TITLE';
-  storyPage = 0;
+  currentDialogue = 0;  // Reset dialogue counter
   gameOver = false;
   score = 0;
   totalScore = 0;

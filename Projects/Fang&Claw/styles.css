@@ -154,11 +154,11 @@ canvas {
 #collection-display {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* Changed from 4 to 3 columns */
     gap: 8px;
-    padding: 10px;
+    padding-bottom: 30px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 /* Message popup */
@@ -231,6 +231,8 @@ canvas {
     grid-template-columns: repeat(2, 1fr);
     gap: 1vh;
     padding: 0.5vh;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
 }
 
 .ball-type {
@@ -241,21 +243,27 @@ canvas {
     border-radius: 5px;
     background: rgba(0, 0, 0, 0.8);
     border: 1px solid #2ecc71;
-    /* Green border */
 }
 
+/* Add styling for bat images */
+.bat-image {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    /* Makes pixel art look crisp */
+}
+
+/* Remove the old ball-color class since we're not using it anymore */
 .ball-color {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
+    display: none;
 }
 
 .ball-amount {
-    font-weight: normal;
-    /* Pixel fonts usually don't need bold */
+    font-family: 'Press Start 2P', cursive;
     color: #ff6b00;
-    /* Orange */
     font-size: 0.9em;
+    margin-left: 5px;
 }
 
 /* Update audio message position */
