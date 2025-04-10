@@ -1,4 +1,34 @@
 /**
+ * Fang & Claw - A Vampire Bat Collection Game
+ * 
+ * Core Systems:
+ * - Game state management and level progression
+ * - Physics-based claw movement and bat behavior
+ * - Power-up system with magnetic claw, double points, and slow motion
+ * - Collection mechanics and scoring system
+ * - Audio system with background music and sound effects
+ * - UI elements and visual feedback
+ * 
+ * Game Flow:
+ * 1. Title screen -> Story -> Tutorial -> Gameplay
+ * 2. Each level requires collecting specific points within time limit
+ * 3. Difficulty increases with level progression
+ * 4. Power-ups appear to assist player
+ * 5. Game ends when time runs out without meeting point requirement
+ * 
+ * Controls:
+ * - Arrow keys: Move claw
+ * - Spacebar: Grab/release bats
+ * - Collect bats at top of screen for points
+ * 
+ * Technical Notes:
+ * - Uses p5.js for rendering and input handling
+ * - Implements HTML5 Audio for sound system
+ * - Responsive canvas sizing
+ * - Local storage for high score persistence
+ */
+
+/**
  * Global game state variables for tracking game mechanics:
  * - balls: Array of all active balls in the game
  * - claw: Object containing claw position and properties
@@ -19,7 +49,7 @@ let score = 0;
 let level = 1;
 let gravity = 0.5;
 let swingForce = 0.2;
-let chainLength = 50;
+let chainLength = 150;
 
 // Game difficulty settings
 let gameLevel = {
@@ -114,6 +144,13 @@ let batImages = {
   green: 'images/green_bat.png',
   purple: 'images/purple_bat.png',
   orange: 'images/orange_bat.png'
+};
+
+// Add these variables at the top with other global variables
+let powerupImages = {
+  MAGNET: null,
+  DOUBLE_POINTS: null,
+  SLOW_TIME: null
 };
 
 /***********************************
@@ -255,6 +292,45 @@ function preload() {
     } catch (e) {
       console.error('Error loading bat images:', e);
       assetsLoaded += 5; // Count all bat images as loaded even if they failed
+    }
+
+    // Load power-up images
+    try {
+      powerupImages.MAGNET = loadImage('images/magnetic_claw.png',
+        () => {
+          console.log('Magnetic Claw image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load magnetic claw image');
+          assetsLoaded++;
+        }
+      );
+
+      powerupImages.DOUBLE_POINTS = loadImage('images/double_point.png',
+        () => {
+          console.log('Double Points image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load double points image');
+          assetsLoaded++;
+        }
+      );
+
+      powerupImages.SLOW_TIME = loadImage('images/slow_motion.png',
+        () => {
+          console.log('Slow Motion image loaded successfully');
+          assetsLoaded++;
+        },
+        () => {
+          console.error('Failed to load slow motion image');
+          assetsLoaded++;
+        }
+      );
+    } catch (e) {
+      console.error('Error loading powerup images:', e);
+      assetsLoaded += 3;
     }
   } catch (e) {
     console.error('Error loading images:', e);
@@ -425,11 +501,14 @@ function resetLevel(currentLevel) {
   claw = {
     x: width / 2,
     y: 50,
-    size: 160,
+    size: 240,
     open: true,
-    speed: gameLevel[getCurrentDifficulty()].speed,
+    speed: 9, // Reduced from 18 to 9 (2x slower)
     angle: 0,
-    swingVelocity: 0
+    swingVelocity: 0,
+    maxSwingAngle: PI / 16,
+    dampening: 0.99,
+    chainElasticity: 0.05
   };
 
   // Increase required points for each level
@@ -546,7 +625,6 @@ function draw() {
     drawBalls();
     drawClaw();
     updateUI();
-    drawTimer();
   }
 }
 
@@ -630,18 +708,31 @@ function drawStoryScreen() {
  */
 function handleClawMovement() {
   const speed = claw.speed;
+
+  // Direct movement without lerp for immediate response
   if (keyIsDown(LEFT_ARROW)) {
-    claw.x = constrain(claw.x - speed, 50, width - 50);
+    claw.x -= speed;
   }
   if (keyIsDown(RIGHT_ARROW)) {
-    claw.x = constrain(claw.x + speed, 50, width - 50);
-  }
-  if (keyIsDown(DOWN_ARROW)) {
-    claw.y = constrain(claw.y + speed, 50, height - 50);
+    claw.x += speed;
   }
   if (keyIsDown(UP_ARROW)) {
-    claw.y = constrain(claw.y - speed, 50, height - 50);
+    claw.y -= speed;
   }
+  if (keyIsDown(DOWN_ARROW)) {
+    claw.y += speed;
+  }
+
+  // Diagonal speed adjustment
+  if ((keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW)) &&
+    (keyIsDown(UP_ARROW) || keyIsDown(DOWN_ARROW))) {
+    claw.x = claw.x * 0.707;
+    claw.y = claw.y * 0.707;
+  }
+
+  // Constrain claw position
+  claw.x = constrain(claw.x, 50, width - 50);
+  claw.y = constrain(claw.y, 50, height - 50);
 }
 
 /**
@@ -656,15 +747,17 @@ function handleClawMovement() {
 function updatePhysics() {
   let difficulty = getCurrentDifficulty();
 
-  // Optimize claw physics
-  claw.swingVelocity += sin(claw.angle) * gameLevel[difficulty].swingForce;
-  claw.angle += claw.swingVelocity;
-  claw.angle = constrain(claw.angle, -PI / 4, PI / 4); // Limit swing angle
-  claw.swingVelocity *= 0.99;
+  // Almost no swing effect
+  let targetAngle = 0;
+  if (keyIsDown(LEFT_ARROW)) targetAngle = -claw.maxSwingAngle * 0.2;
+  if (keyIsDown(RIGHT_ARROW)) targetAngle = claw.maxSwingAngle * 0.2;
+
+  // Very minimal angle transition
+  claw.angle = lerp(claw.angle, targetAngle, 0.2);
 
   let actualX = claw.x + sin(claw.angle) * 10;
 
-  // Update selected balls more efficiently
+  // Update selected balls with immediate following
   for (let ball of selectedBalls) {
     if (!claw.open) {
       ball.x = actualX;
@@ -678,29 +771,47 @@ function updatePhysics() {
     }
   }
 
-  // Optimize free ball physics
+  // Update free balls with enhanced escape behavior
   for (let ball of balls) {
     if (!ball.selected) {
       let d = dist(claw.x, claw.y + 20, ball.x, ball.y);
+      let escapeDistance = claw.size * 2; // Increased detection range
 
-      // Simplified escape behavior
-      if (d < claw.size * 1.5 && random() < 0.15) {
-        let angle = atan2(ball.y - (claw.y + 20), ball.x - claw.x);
-        ball.vx = cos(angle) * 2.5;
-        ball.vy = sin(angle) * 2.5;
+      // Enhanced escape behavior
+      if (d < escapeDistance) {
+        let escapeChance = gameLevel[difficulty].dropChance;
+        // Double escape chance if not magnetic claw
+        if (!activePowerups.MAGNET) escapeChance *= 2;
+
+        if (random() < escapeChance) {
+          let angle = atan2(ball.y - (claw.y + 20), ball.x - claw.x);
+          let escapeSpeed = 3; // Increased from 2
+          ball.vx = cos(angle) * escapeSpeed;
+          ball.vy = sin(angle) * escapeSpeed;
+
+          // Add random variation to make movement less predictable
+          ball.vx += random(-0.5, 0.5);
+          ball.vy += random(-0.5, 0.5);
+        }
       }
 
-      // Update position with constraints
+      // Smoother movement with increased speed
       ball.x = constrain(ball.x + ball.vx, 50, width - 50);
       ball.y = constrain(ball.y + ball.vy, 100, height - 50);
 
-      // Bounce handling
-      if (ball.x <= 50 || ball.x >= width - 50) ball.vx *= -0.8;
-      if (ball.y <= 100 || ball.y >= height - 50) ball.vy *= -0.8;
+      // More energetic bouncing
+      if (ball.x <= 50 || ball.x >= width - 50) {
+        ball.vx *= -1.1; // Bounce with increased velocity
+        ball.vy += random(-0.5, 0.5); // Add vertical variation
+      }
+      if (ball.y <= 100 || ball.y >= height - 50) {
+        ball.vy *= -1.1; // Bounce with increased velocity
+        ball.vx += random(-0.5, 0.5); // Add horizontal variation
+      }
 
-      // Apply friction
-      ball.vx *= 0.99;
-      ball.vy *= 0.99;
+      // Reduced friction for more persistent movement
+      ball.vx *= 0.998;
+      ball.vy *= 0.998;
     }
   }
 }
@@ -712,39 +823,30 @@ function drawBalls() {
   for (let ball of balls) {
     push();
     if (ball.isPowerup) {
-      // Check if it's the Double Points power-up (orange)
-      if (ball.powerupType === 'DOUBLE_POINTS') {
-        imageMode(CENTER);
+      imageMode(CENTER);
+      let powerupImage = powerupImages[ball.powerupType];
+
+      if (powerupImage) {
         if (ball.selected) {
           tint(255, 255, 255, 200);
-          image(batImages.orange, ball.x, ball.y, ball.size * 1.2, ball.size * 1.2);
+          image(powerupImage, ball.x, ball.y, ball.size * 1.2, ball.size * 1.2);
           noTint();
         } else {
-          image(batImages.orange, ball.x, ball.y, ball.size, ball.size);
+          image(powerupImage, ball.x, ball.y, ball.size, ball.size);
         }
 
-        // Add sparkle effect
-        noFill();
-        stroke(255);
-        strokeWeight(1);
+        // Fix sparkle effect
+        push();
+        translate(ball.x, ball.y);
         rotate(ball.sparkleAngle);
-        line(ball.x - ball.size, ball.y, ball.x + ball.size, ball.y);
-        line(ball.x, ball.y - ball.size, ball.x, ball.y + ball.size);
-        ball.sparkleAngle += 0.05;
-      } else {
-        // Other power-up balls remain as circles
-        fill(ball.color);
-        stroke(255);
+        noFill();
+        stroke(255, 255, 255, 150); // Added alpha for softer effect
         strokeWeight(2);
-        circle(ball.x, ball.y, ball.size * 1.2);
+        let sparkleSize = ball.size * 0.7; // Scale sparkle with power-up size
+        line(-sparkleSize / 2, 0, sparkleSize / 2, 0);
+        line(0, -sparkleSize / 2, 0, sparkleSize / 2);
+        pop();
 
-        // Add sparkle effect
-        noFill();
-        stroke(255);
-        strokeWeight(1);
-        rotate(ball.sparkleAngle);
-        line(ball.x - ball.size, ball.y, ball.x + ball.size, ball.y);
-        line(ball.x, ball.y - ball.size, ball.x, ball.y + ball.size);
         ball.sparkleAngle += 0.05;
       }
     } else {
@@ -768,22 +870,22 @@ function drawBalls() {
  * Draws the claw and its chain
  */
 function drawClaw() {
-  let actualX = claw.x + sin(claw.angle) * 10;
-  stroke('#ff6b00'); // Change from black (0) to orange
-  strokeWeight(3); // Made slightly thicker for better visibility
+  let actualX = claw.x + sin(claw.angle) * 10; // Reduced from 30 to 10
+  stroke('#ff6b00');
+  strokeWeight(9);
 
-  // Draw chain/rope
+  // Draw straight chain/rope
   line(claw.x, 0, actualX, claw.y);
 
-  // Draw claw parts
+  // Draw claw parts with less spread
   if (claw.open) {
-    // Open claw
-    line(actualX - 20, claw.y, actualX - 10, claw.y + 20);
-    line(actualX + 20, claw.y, actualX + 10, claw.y + 20);
+    // Open claw (slightly reduced spread)
+    line(actualX - 50, claw.y, actualX - 25, claw.y + 60);
+    line(actualX + 50, claw.y, actualX + 25, claw.y + 60);
   } else {
-    // Closed claw
-    line(actualX - 15, claw.y, actualX, claw.y + 20);
-    line(actualX + 15, claw.y, actualX, claw.y + 20);
+    // Closed claw (tighter grip)
+    line(actualX - 35, claw.y, actualX, claw.y + 60);
+    line(actualX + 35, claw.y, actualX, claw.y + 60);
   }
 }
 
@@ -791,8 +893,28 @@ function drawClaw() {
  * Updates UI elements with current game state
  */
 function updateUI() {
+  // Update all display values
   document.getElementById('score-display').textContent = score;
   document.getElementById('level-display').textContent = level;
+  document.getElementById('time-display').textContent = timeLeft;
+  document.getElementById('required-display').textContent = requiredPoints;
+
+  // Handle time warning
+  const timeValue = document.querySelector('.time-value');
+  if (timeLeft <= 10) {
+    timeValue.classList.add('warning');
+  } else {
+    timeValue.classList.remove('warning');
+  }
+
+  // Handle required points met
+  const requiredValue = document.querySelector('.required-value');
+  if (score >= requiredPoints) {
+    requiredValue.classList.add('met');
+  } else {
+    requiredValue.classList.remove('met');
+  }
+
   updateCollectionDisplay();
 }
 
@@ -920,7 +1042,12 @@ function collectBall(ball) {
  * Attempts to grab balls near the claw
  */
 function grabNearbyBalls() {
+  let maxGrabbableBalls = activePowerups.MAGNET ? 2 : 1; // Only allow multiple grabs with magnetic claw
+  let grabbedCount = 0;
+
   for (let ball of balls) {
+    if (grabbedCount >= maxGrabbableBalls) break;
+
     let d = dist(claw.x, claw.y + 20, ball.x, ball.y);
     if (d < claw.size && !ball.selected) {
       ball.selected = true;
@@ -928,6 +1055,10 @@ function grabNearbyBalls() {
       ball.x = claw.x;
       ball.y = claw.y + 30;
       playSound('grab');
+      grabbedCount++;
+
+      // If not magnetic claw, break after first grab
+      if (!activePowerups.MAGNET) break;
     }
   }
 }
@@ -941,11 +1072,13 @@ function showMessage(text, isPowerup = false) {
   let messageText = document.getElementById('message-text');
   messageText.innerText = text;
   messageText.style.fontFamily = "'Press Start 2P', cursive";
+  messageText.style.fontSize = "36px"; // Increase popup message text size
   messageDiv.style.display = 'block';
+  messageDiv.style.padding = "30px 40px"; // Increase padding to accommodate larger text
 
   // Use different background colors based on message type
   if (isPowerup) {
-    messageDiv.style.backgroundColor = 'rgba(155, 89, 182, 0.2)'; // Purple for power-ups
+    messageDiv.style.backgroundColor = 'rgba(155, 89, 182, 0.2)';
   } else {
     messageDiv.style.backgroundColor = text.includes('+') ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 107, 0, 0.2)';
   }
@@ -955,7 +1088,6 @@ function showMessage(text, isPowerup = false) {
     clearTimeout(messageDiv.hideTimeout);
   }
 
-  // Power-up messages show for 2 seconds, points for 1 second, lost for 2 seconds
   let duration = isPowerup ? 2000 : (text.includes('+') ? 1000 : 2000);
   messageDiv.hideTimeout = setTimeout(() => {
     messageDiv.style.display = 'none';
@@ -995,7 +1127,7 @@ function updateCollectionDisplay() {
 
     // Create an img element for the bat
     const batImg = document.createElement('img');
-    batImg.src = `images/${color}_bat.png`; // Use the correct path to your bat images
+    batImg.src = `images/${color}_bat.png`;
     batImg.className = 'bat-image';
     batImg.width = 30;
     batImg.height = 30;
@@ -1010,53 +1142,17 @@ function updateCollectionDisplay() {
   });
 
   display.appendChild(countDisplay);
-}
 
-/**
- * Draws the timer and required points
- */
-function drawTimer() {
-  push();
-  setStandardText(clamp(width * 0.03, 16, 20)); // Slightly smaller font for fitting all text
-  textAlign(CENTER, BOTTOM); // Align text center and bottom
-
-  // Calculate position at the bottom of the screen
-  let yPos = height - 20; // 20 pixels from bottom
-
-  // Draw semi-transparent background for better readability
-  noStroke();
-  fill(0, 0, 0, 180);
-  rect(10, yPos - 30, width - 20, 40, 8); // Background rectangle for text
-
-  // Combine all information in one line with spacing
-  let timeText = `TIME: ${timeLeft}s`;
-  let requiredText = `REQUIRED: ${requiredPoints}`;
-  let scoreText = `SCORE: ${score}`;
-
-  // Calculate spacing between elements
-  let spacing = width / 4;
-
-  // Draw time with flashing effect when low
-  if (timeLeft <= 10) {
-    timerFlashAlpha += timerFlashDirection * 15;
-    if (timerFlashAlpha >= 255 || timerFlashAlpha <= 0) {
-      timerFlashDirection *= -1;
-    }
-    fill(255, 0, 0, timerFlashAlpha); // Red with flashing
-  } else {
-    fill('#ff6b00'); // Normal orange color
-  }
-  text(timeText, spacing, yPos);
-
-  // Draw required points
-  fill(score >= requiredPoints ? '#2ecc71' : '#ff6b00'); // Green if met, orange if not
-  text(requiredText, width / 2, yPos);
-
-  // Draw score
-  fill('#ff6b00');
-  text(scoreText, width - spacing, yPos);
-
-  pop();
+  // Scroll to the center of the collection display
+  requestAnimationFrame(() => {
+    const scrollHeight = display.scrollHeight;
+    const clientHeight = display.clientHeight;
+    const centerPosition = (scrollHeight - clientHeight) / 2;
+    display.scrollTo({
+      top: centerPosition,
+      behavior: 'smooth'
+    });
+  });
 }
 
 /**
@@ -1090,12 +1186,10 @@ function showGameOver() {
 
   // Draw game over background
   if (gameOverImg) {
-    // Clear any existing background
     background(0);
-    // Draw only the game over image
     image(gameOverImg, 0, 0, width, height);
   } else {
-    background(0); // Black background as fallback
+    background(0);
   }
 
   let finalScore = totalScore + score;
@@ -1116,15 +1210,13 @@ function showGameOver() {
   text(`High Score: ${highScore}`, width / 2, height / 2 + 40);
 
   if (newHighScore) {
-    fill('#2ecc71'); // Keep green for new high score
+    fill('#2ecc71');
     text('NEW HIGH SCORE!', width / 2, height / 2 + 70);
   }
 
   fill('#ff6b00');
   text('Press SPACE to restart', width / 2, height / 2 + 100);
   pop();
-
-  playSound('gameOver');
 }
 
 function loadHighScore() {
@@ -1153,14 +1245,14 @@ function addPowerupBalls() {
       x: random(50, width - 50),
       y: random(100, height - 50),
       color: powerup.color,
-      size: 25,
+      size: 100,  // Changed from 25 to 100 to make power-ups 4 times bigger
       selected: false,
       vx: random(-0.5, 0.5),
       vy: random(-0.5, 0.5),
       isPowerup: true,
       powerupType: powerupType,
       value: 50,
-      sparkleAngle: 0 // For visual effect
+      sparkleAngle: 0
     });
   }
 }
@@ -1269,6 +1361,10 @@ function drawLevelTransition() {
 function playSound(soundName) {
   if (soundsEnabled && soundsLoaded && sounds[soundName]) {
     try {
+      // Stop the sound if it's already playing
+      if (sounds[soundName].isPlaying()) {
+        sounds[soundName].stop();
+      }
       sounds[soundName].play();
     } catch (e) {
       console.error(`Error playing ${soundName}:`, e);

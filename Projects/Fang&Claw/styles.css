@@ -1,4 +1,13 @@
-/* Base styles */
+/* Fang & Claw Game Styles
+ * Main game interface and layout styles
+ * - Base layout and responsive containers
+ * - Game panels and UI elements
+ * - Collection area and bat display
+ * - Visual effects and animations
+ * - Game stats and level display
+ * - Message popups and notifications
+ */
+
 body {
     display: flex;
     justify-content: flex-start;
@@ -15,47 +24,39 @@ body {
     color: #ff6b00;
 }
 
-/* Left sidebar container */
 .sidebar {
     position: fixed;
     left: 2vw;
     top: 2vh;
     height: 96vh;
-    width: 20vw;
-    /* Reduced width */
-    min-width: 250px;
-    max-width: 350px;
+    width: 30vw;
+    min-width: 400px;
+    max-width: 450px;
     display: flex;
     flex-direction: column;
     gap: 0;
     z-index: 2;
 }
 
-/* Game canvas positioning */
 canvas {
     position: fixed !important;
-    left: calc(22vw + 2vw) !important;
-    /* sidebar width + gap */
+    left: calc(22.5vw + 2vw) !important;
     top: 2vh !important;
-    width: calc(76vw - 2vw) !important;
-    /* Remaining width minus padding */
     height: 96vh !important;
     object-fit: contain !important;
 }
 
-/* Game container to center canvas */
 .game-container {
     position: fixed;
-    left: calc(22vw + 2vw);
+    left: calc(32vw + 2vw);
     top: 2vh;
-    width: calc(76vw - 2vw);
+    width: calc(44vw - 2vw);
     height: 96vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Common panel styling */
 .panel {
     position: relative;
     width: 100%;
@@ -68,7 +69,6 @@ canvas {
     color: #ff6b00;
 }
 
-/* Remove rounded corners from panel connections */
 .panel+.panel {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -80,26 +80,23 @@ canvas {
     border-bottom-right-radius: 0;
 }
 
-/* Controls panel - remove fixed positioning */
 .controls {
     position: relative;
     width: 100%;
     border-radius: 0;
-    font-size: clamp(10px, 1vw, 14px);
+    font-size: clamp(14px, 1.4vw, 20px);
 }
 
-/* Make all panel headers consistent */
 .panel h3 {
     margin-top: 0;
-    margin-bottom: 1.5vh;
+    margin-bottom: 2vh;
     color: #ff6b00;
-    font-size: clamp(12px, 1.2vw, 16px);
+    font-size: clamp(16px, 1.6vw, 24px);
     border-bottom: 2px solid #9b59b6;
-    padding-bottom: 0.8vh;
+    padding-bottom: 1vh;
     letter-spacing: 1px;
 }
 
-/* Remove the specific h3 styles from controls */
 .controls h3 {
     margin-top: 0;
     margin-bottom: 15px;
@@ -123,71 +120,66 @@ canvas {
     position: absolute;
     left: 0;
     color: #2ecc71;
-    /* Green */
 }
 
-/* Score display - remove fixed positioning */
 .score-display {
-    flex-grow: 1;
-    min-height: 15vh;
+    display: none;
 }
 
-.score-value {
-    font-weight: bold;
-    color: #ff6b00;
-    /* Orange */
-    margin: 10px 0;
-}
-
+.score-value,
 .level-value {
-    color: #9b59b6;
-    /* Purple */
+    font-size: 1.4em;
+    margin: 20px 10px;
+    text-align: center;
+    padding: 15px 20px;
+    background: rgba(255, 107, 0, 0.1);
+    border: 1px solid #ff6b00;
+    border-radius: 5px;
 }
 
-/* Collection area - remove fixed positioning */
 .collection-area {
     flex-grow: 1;
-    min-height: 15vh;
+    min-height: 25vh;
+    margin-bottom: 2vh;
 }
 
-/* Collection display */
 #collection-display {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding-bottom: 30px;
+    gap: 12px;
+    padding: 20px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
     margin-bottom: 20px;
+    max-height: calc(25vh - 40px);
+    overflow-y: auto;
+    min-height: 120px;
 }
 
-/* Message popup */
 .message {
     position: fixed;
     top: 50%;
-    left: calc(22vw + 2vw + ((76vw - 2vw) / 2));
+    left: calc(32vw + 2vw + (44vw - 2vw) / 2);
     transform: translate(-50%, -50%);
     z-index: 1000;
-    width: 25vw;
-    min-width: 250px;
-    max-width: 400px;
+    width: 35vw;
+    min-width: 350px;
+    max-width: 500px;
     display: none;
     text-align: center;
-    padding: 15px 25px;
+    padding: 30px 40px;
     background: rgba(0, 0, 0, 0.95);
-    border: 1px solid #ff6b00;
+    border: 2px solid #ff6b00;
 }
 
 .message p {
-    margin: 10px 0;
-    font-size: 12px;
-    /* Consistent pixel font size */
+    margin: 15px 0;
+    font-size: 36px;
     font-family: 'Press Start 2P', cursive;
     color: #ff6b00;
     word-wrap: break-word;
     letter-spacing: 1px;
     text-transform: uppercase;
-    /* More arcade-like */
 }
 
 .close-btn {
@@ -201,17 +193,14 @@ canvas {
     text-align: center;
     border-radius: 50%;
     background: #9b59b6;
-    /* Purple */
     color: #000000;
     font-weight: bold;
 }
 
 .close-btn:hover {
     background: #8e44ad;
-    /* Darker purple */
 }
 
-/* Color points styling */
 .color-points {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -225,36 +214,34 @@ canvas {
     font-weight: bold;
 }
 
-/* Style for ball count display */
 .ball-count {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1vh;
-    padding: 0.5vh;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 5px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .ball-type {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px;
-    border-radius: 5px;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 6px;
     background: rgba(0, 0, 0, 0.8);
-    border: 1px solid #2ecc71;
+    border: 2px solid #2ecc71;
+    min-height: 60px;
 }
 
-/* Add styling for bat images */
 .bat-image {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     image-rendering: pixelated;
-    /* Makes pixel art look crisp */
 }
 
-/* Remove the old ball-color class since we're not using it anymore */
 .ball-color {
     display: none;
 }
@@ -262,15 +249,203 @@ canvas {
 .ball-amount {
     font-family: 'Press Start 2P', cursive;
     color: #ff6b00;
-    font-size: 0.9em;
+    font-size: 1.3em;
     margin-left: 5px;
+    min-width: 45px;
+    text-align: right;
 }
 
-/* Update audio message position */
 #audio-message {
     position: fixed;
     top: 45%;
     left: calc(22vw + 2vw + ((76vw - 2vw) / 2));
     transform: translateX(-50%);
     z-index: 9999;
+}
+
+.powerup-icon {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    margin-right: 12px;
+    image-rendering: pixelated;
+}
+
+.controls h4 {
+    color: #ff6b00;
+    margin: 20px 0 15px 0;
+    font-size: 1.2em;
+    border-bottom: 1px solid #9b59b6;
+    padding-bottom: 8px;
+}
+
+.right-sidebar {
+    position: fixed;
+    right: 2vw;
+    top: 2vh;
+    height: 96vh;
+    width: 20vw;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    padding-right: 0;
+}
+
+.bat-values-panel {
+    background: rgba(0, 0, 0, 0.95);
+    padding: 2vh 2.5vw;
+    width: 90%;
+    margin: 0 0.5vw 2vw 2vw;
+    box-sizing: border-box;
+}
+
+.right-sidebar>div {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.bat-values-panel h3 {
+    margin-top: 0;
+    margin-bottom: 2vh;
+    color: #ff6b00;
+    font-size: clamp(16px, 1.6vw, 24px);
+    border-bottom: 2px solid #9b59b6;
+    padding-bottom: 1vh;
+    letter-spacing: 1px;
+}
+
+.bat-values-panel h4 {
+    color: #ff6b00;
+    margin: 30px 0 15px 0;
+    font-size: clamp(16px, 1.6vw, 24px);
+    border-bottom: 2px solid #9b59b6;
+    padding-bottom: 1vh;
+    letter-spacing: 1px;
+}
+
+.bat-values-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bat-values-list li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    margin: 0 10px 25px 10px;
+    padding: 20px 30px 20px 20px;
+    background: rgba(255, 107, 0, 0.1);
+    border: 1px solid #ff6b00;
+    border-radius: 5px;
+}
+
+.bat-value-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.bat-values-list span {
+    color: #ff6b00;
+    font-size: 1.4em;
+    font-family: 'Press Start 2P', cursive;
+    padding-right: 15px;
+    margin-left: auto;
+}
+
+.game-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.time-value,
+.required-value,
+.score-value,
+.level-value {
+    font-size: 1.4em;
+    margin: 0;
+    text-align: center;
+    padding: 15px 20px;
+    background: rgba(255, 107, 0, 0.1);
+    border: 1px solid #ff6b00;
+    border-radius: 5px;
+}
+
+.time-value.warning {
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+
+    0%,
+    100% {
+        background: rgba(255, 0, 0, 0.1);
+        border-color: #ff0000;
+    }
+
+    50% {
+        background: rgba(255, 0, 0, 0.3);
+        border-color: #ff0000;
+    }
+}
+
+.required-value.met {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: #2ecc71;
+}
+
+#collection-display::-webkit-scrollbar {
+    width: 8px;
+}
+
+#collection-display::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+#collection-display::-webkit-scrollbar-thumb {
+    background: #ff6b00;
+    border-radius: 4px;
+}
+
+#collection-display::-webkit-scrollbar-thumb:hover {
+    background: #ff8533;
+}
+
+.level-value {
+    font-size: 3.8em;
+    margin: 0 0 10px 0;
+    text-align: center;
+    padding: 20px 25px;
+    background: rgba(155, 89, 182, 0.2);
+    border: 2px solid #9b59b6;
+    border-radius: 5px;
+    color: #9b59b6;
+    order: -1;
+}
+
+.game-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.time-value,
+.required-value,
+.score-value {
+    font-size: 1.4em;
+    margin: 0;
+    text-align: center;
+    padding: 15px 20px;
+    background: rgba(255, 107, 0, 0.1);
+    border: 1px solid #ff6b00;
+    border-radius: 5px;
 }

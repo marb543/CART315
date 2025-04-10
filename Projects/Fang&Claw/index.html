@@ -18,29 +18,36 @@
     <div class="sidebar">
         <div class="controls panel">
             <h3>How to Play</h3>
-            <ul>
-                <li>⬅️ ➡️ Arrow Keys: Move claw left/right</li>
-                <li>⬆️ ⬇️ Arrow Keys: Move claw up/down</li>
-                <li>Space: Open/Close claw to grab bats</li>
-                <li>Warning: Bats might fly away at the top!</li>
-            </ul>
-            <h4>Power-ups:</h4>
-            <ul>
-                <li style="color: #FF00FF">★ Magnetic Claw - Larger grab range</li>
-                <li style="color: #00FFFF">★ Double Points - Score twice the points</li>
-                <li style="color: #FFD700">★ Slow Motion - Slows down all bats</li>
-            </ul>
+            <div class="controls-container">
+                <div class="controls-left">
+                    <ul>
+                        <li>⬅️ ➡️ Arrow Keys: Move claw left/right</li>
+                        <li>⬆️ ⬇️ Arrow Keys: Move claw up/down</li>
+                        <li>Space: Open/Close claw to grab bats</li>
+                        <li>Warning: Bats might fly away at the top!</li>
+                    </ul>
+                    <h4>Power-ups:</h4>
+                    <ul>
+                        <li style="color: #ff6b00">
+                            <img src="images/magnetic_claw.png" class="powerup-icon" alt="Magnetic Claw">
+                            Magnetic Claw - Larger grab range
+                        </li>
+                        <li style="color: #ff6b00">
+                            <img src="images/double_point.png" class="powerup-icon" alt="Double Points">
+                            Double Points - Score twice the points
+                        </li>
+                        <li style="color: #ff6b00">
+                            <img src="images/slow_motion.png" class="powerup-icon" alt="Slow Motion">
+                            Slow Motion - Slows down all bats
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div class="collection-area panel">
             <h3>Collection Area</h3>
             <div id="collection-display"></div>
-        </div>
-
-        <div class="score-display panel">
-            <h3>Game Stats</h3>
-            <div class="score-value">Score: <span id="score-display">0</span></div>
-            <div class="level-value">Level: <span id="level-display">1</span></div>
         </div>
     </div>
 
@@ -50,6 +57,42 @@
     </div>
 
     <div class="game-container"></div>
+
+    <div class="right-sidebar">
+        <div class="bat-values-panel panel">
+            <h3>Bat Values</h3>
+            <ul class="bat-values-list">
+                <li>
+                    <img src="images/red_bat.png" class="bat-value-icon" alt="Red Bat">
+                    <span>10 POINTS</span>
+                </li>
+                <li>
+                    <img src="images/blue_bat.png" class="bat-value-icon" alt="Blue Bat">
+                    <span>15 POINTS</span>
+                </li>
+                <li>
+                    <img src="images/yellow_bat.png" class="bat-value-icon" alt="Yellow Bat">
+                    <span>20 POINTS</span>
+                </li>
+                <li>
+                    <img src="images/green_bat.png" class="bat-value-icon" alt="Green Bat">
+                    <span>25 POINTS</span>
+                </li>
+                <li>
+                    <img src="images/purple_bat.png" class="bat-value-icon" alt="Purple Bat">
+                    <span>30 POINTS</span>
+                </li>
+            </ul>
+
+            <h4>Game Stats</h4>
+            <div class="game-stats">
+                <div class="time-value">Time: <span id="time-display">60</span>s</div>
+                <div class="required-value">Required: <span id="required-display">100</span></div>
+                <div class="score-value">Score: <span id="score-display">0</span></div>
+                <div class="level-value">Level: <span id="level-display">1</span></div>
+            </div>
+        </div>
+    </div>
 
     <script src="sketch.js"></script>
 </body>
