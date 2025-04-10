@@ -416,63 +416,79 @@ This iteration focuses on the visual aspect of the game as well as the functiona
 whole game with assets that correspond to this style. I made sure to combine png assets from Adobe Stock with assets created by AI 
 which I have manually photoshopped later so it fits well in my game. When the user first starts the game there is a story mode they have to go through at the beginning of the game by pressing SPACE. I also reworked the functionality of my game. Users can no longer catch bats in batches without the magnetic claw powerup.
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.1.png)
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.1.png)
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.2.png)
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.2.png)
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.1.png)
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.3.png)
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.2.png)
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.4.png)
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.1.png)
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.5.png)
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.2.png)
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.6.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.7.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.8.png)
 
 ## What is the objective of this iteration ? : 
-- I made sure to enhance player feedback with sound and visual effects.
-- I improved the overall style of the game.
-- I added stock images to enhance game storytelling.
+- Focused on both visual design and functionality improvements.
+- Ensured consistent visual style across the entire game.
+- Used a combination of:PNG assets from Adobe Stock.AI-generated assets, manually edited in Photoshop to match the game's aesthetic.
+- Introduced a story mode at the beginning of the game:
+- Activated by pressing the SPACE key.
+- Reworked gameplay functionality:
+- Players can no longer catch multiple bats at once.
+- The magnetic claw power-up is now required to catch bats in batches.
 
 ### Newly added features :
-## 1.Added New Sounds 
-- background_sound.mp3 – Background game music.- source : https://pixabay.com/music/video-games-pixel-fight-8-bit-arcade-music-background-music-for-video-208775/
-- gameover.mp3 – Game over state.- source : https://pixabay.com/sound-effects/game-over-38511/
+## 1.New PNG assets (AI-generated & Photoshop) 
 
-## 2. Added Adobe Stock images to the game
-- dracula.png - source : https://stock.adobe.com/ca/search/images?filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bcontent_type%3Aillustration%5D=1&filters%5Bcontent_type%3Azip_vector%5D=1&filters%5Bfetch_excluded_assets%5D=1&filters%5Binclude_stock_enterprise%5D=1&filters%5Bcontent_type%3Aimage%5D=1&k=pixelated+vampire&order=relevance&price%5B%24%5D=1&search_page=1&search_type=usertyped&acp=&aco=pixelated+vampire&get_facets=0&asset_id=1092292850
-- game_over.png - source : https://stock.adobe.com/ca/search/images?filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bcontent_type%3Aillustration%5D=1&filters%5Bcontent_type%3Azip_vector%5D=1&filters%5Bfetch_excluded_assets%5D=1&filters%5Binclude_stock_enterprise%5D=1&filters%5Bcontent_type%3Aimage%5D=1&k=pixelated+vampire&order=relevance&price%5B%24%5D=1&search_page=1&search_type=usertyped&acp=&aco=pixelated+vampire&get_facets=0&asset_id=592295840
-- main_background.png - source : https://stock.adobe.com/ca/search/images?k=pixelated+horror+game&search_type=usertyped&asset_id=1016525102
-- mice.png - source : https://stock.adobe.com/ca/search/images?filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bfetch_excluded_assets%5D=1&filters%5Binclude_stock_enterprise%5D=1&filters%5Bcontent_type%3Aimage%5D=1&k=pixelated+mice+character&order=relevance&limit=100&search_page=1&search_type=usertyped&acp=&aco=pixelated+mice+character&get_facets=0&asset_id=710020059
+- dialogue1.png to dialogue6.png : Manually Created Assets in Photoshop by combining dracula.png and text
+- blue_bat : Cropped AI-generated asset from Dalle-3 promt : generate an image of 6 pixelated bats in red, blue, yellow, green, purple
+- green_bat : Cropped AI-generated asset from Dalle-3 : promt : generate an image of 6 pixelated bats in red, blue, yellow, green, purple
+- orange_bat : Cropped AI-generated asset from Dalle-3 promt : generate an image of 6 pixelated bats in red, blue, yellow, green, purple
+- red_bat : Cropped AI-generated asset from Dalle-3 promt : generate an image of 6 pixelated bats in red, blue, yellow, green, purple
+- purple-bat : Cropped AI-generated asset from Dalle-3 : promt : generate an image of 6 pixelated bats in red, blue, yellow, green, purple
+- yellow bat : Cropped AI-generated asset from Dalle-3 promt : generate an image of 6 pixelated bats in red, blue, yellow, green, purple
+- starter_image : AI-generated asset from Dalle-3 with the promt : Generate a cover image for an arcade pixel style video game called fang and claw with font style 'Press Start 2P', cursive; where you have the title of the game in the middle, and pixel bats in a claw machine and written press space to start at the bottom
+- magnetic_claw.png : Cropped AI-generated asset from Dalle-3 with the promt : Create me images of 3 pixelated things for these game powerups (and image of powerup description)
+- double_point.png : Cropped AI-generated asset from Dalle-3 with the promt : Create me images of 3 pixelated things for these game powerups (and image of powerup description)
+- slow_motion.png : Cropped AI-generated asset from Dalle-3 with the promt : Create me images of 3 pixelated things for these game powerups (and image of powerup description)
+- main_background.png : AI-generated asset from Dalle-3 with the promt : Give me a good background for my claw machine game where I will put these bats
 
-## 3. Improved styles.css
-- Start game/sound on any button press.
-- Implement a horror-style palette.
-- Make sure game elements size stays consistent for all screen sizes and ratios.
+## 2. New Game Panel (Right side)
+- Added a right side panel 
+- It contains instructions for how many points each bat generates as well as Game Stats (level, time, required, score)
+
+## 3. Added A Story Mode
+- Quick story mode at the beginng of the game
+- User must click SPACE to go through it
+- Increases User Engagement
 
 ## Questions I am trying to answer : 
-- How does audio-visual synchronization affect player immersion ?
-- How to create tension through UI elements ?
-- What's the right balance for information density ?
+- How to make the claw feel responsive yet challenging to control?
+- Is the magnetic claw power-up (allowing 2 bats) meaningful enough?
+- What's the right balance between challenge and satisfaction in catching bats?
+- How should bats behave when escaping the claw? (Enhanced escape behavior with randomness)
 
 
 ### Describe the type of prototype/fidelity level/tools :
-- Fidelity Level: This is a medium to high prototype with refined visual feedback, sound integration, and smooth transition.
+- Fidelity Level: This is a high fidelity prototype. It has full gameplay implementation with working mechanics.
 - Tools: I used p5.js for game mechanics, HTML/CSS for building the UI of my game, p5.sound for audio handling.
-- Type: This is a  look & feel prototype.
-- Focus: The focus of this prototype was visual feedback, styling of the game and overall graphics.
+- Type: This prototype is well beyond a proof-of-concept, it can be used for gameplay testing.
+- Focus: It has a complete UI system with visual feedback as well as an integrated sound system, as well as score tracking and a level progression system.
 
 ## Lessons Learned
-- Game components should keep the same size/ratio/position on all screen sizes.
-- To improve game's overall visual identity, make sure to follow a clear color palette.
-I decided to keep my color palette simple with tones of black, purple, orange, green, and blue
-which reminds of a horror game style.
-- Players should only be able to to start playing the game as soon as they press a button.
-- The same logic applies to sound being played to avoid issues with p5.sound not playing sound
-properly.
-- To simplify game styling, use already available stock images provided with the Adobe Stock educational license.
+- Need to implement good error handling for the sound system.
+- I need to make sure canvas sizinf is responsive and maintains aspect ratio on al screens.
+- Story Mode allows for better gameplay.
+- Power-up effects need clear visal and mechanical differentiation.
+- My code needs to be organized according to physics, rendering, UI, sound and assets.
+- Iterative developemnt makes for a better final product.
 
 ## Next Steps
-1. Add a start screen
-2. Implement a story mode so that player goes through a story everytime he strats the game.
-3. Implement game characters design into claw machine mechanics. (For example, when a ball is caught it can be either a mouse
-or a bat). And the player gains points if he catches a mouse and loses points if he catches a bat.
+1. Improve look and feel of Game Over page.
+2. Fix text sizing issues inside canvas.
+3. Increase game difficulty.
