@@ -409,3 +409,70 @@ properly.
 2. Implement a story mode so that player goes through a story everytime he strats the game.
 3. Implement game characters design into claw machine mechanics. (For example, when a ball is caught it can be either a mouse
 or a bat). And the player gains points if he catches a mouse and loses points if he catches a bat.
+
+## Fang & Claw: A Grabby Situation (Iteration 6) | 04.10.25
+
+This iteration focuses on the visual aspect of the game as well as the functionality. I made sure to have consistent styles for the 
+whole game with assets that correspond to this style. I made sure to combine png assets from Adobe Stock with assets created by AI 
+which I have manually photoshopped later so it fits well in my game. When the user first starts the game there is a story mode they have to go through at the beginning of the game by pressing SPACE. I also reworked the functionality of my game. Users can no longer catch bats in batches without the magnetic claw powerup.
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.1.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.2.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.1.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.2.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.1.png)
+
+![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype5.2.png)
+
+## What is the objective of this iteration ? : 
+- I made sure to enhance player feedback with sound and visual effects.
+- I improved the overall style of the game.
+- I added stock images to enhance game storytelling.
+
+### Newly added features :
+## 1.Added New Sounds 
+- background_sound.mp3 – Background game music.- source : https://pixabay.com/music/video-games-pixel-fight-8-bit-arcade-music-background-music-for-video-208775/
+- gameover.mp3 – Game over state.- source : https://pixabay.com/sound-effects/game-over-38511/
+
+## 2. Added Adobe Stock images to the game
+- dracula.png - source : https://stock.adobe.com/ca/search/images?filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bcontent_type%3Aillustration%5D=1&filters%5Bcontent_type%3Azip_vector%5D=1&filters%5Bfetch_excluded_assets%5D=1&filters%5Binclude_stock_enterprise%5D=1&filters%5Bcontent_type%3Aimage%5D=1&k=pixelated+vampire&order=relevance&price%5B%24%5D=1&search_page=1&search_type=usertyped&acp=&aco=pixelated+vampire&get_facets=0&asset_id=1092292850
+- game_over.png - source : https://stock.adobe.com/ca/search/images?filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bcontent_type%3Aillustration%5D=1&filters%5Bcontent_type%3Azip_vector%5D=1&filters%5Bfetch_excluded_assets%5D=1&filters%5Binclude_stock_enterprise%5D=1&filters%5Bcontent_type%3Aimage%5D=1&k=pixelated+vampire&order=relevance&price%5B%24%5D=1&search_page=1&search_type=usertyped&acp=&aco=pixelated+vampire&get_facets=0&asset_id=592295840
+- main_background.png - source : https://stock.adobe.com/ca/search/images?k=pixelated+horror+game&search_type=usertyped&asset_id=1016525102
+- mice.png - source : https://stock.adobe.com/ca/search/images?filters%5Bcontent_type%3Aphoto%5D=1&filters%5Bfetch_excluded_assets%5D=1&filters%5Binclude_stock_enterprise%5D=1&filters%5Bcontent_type%3Aimage%5D=1&k=pixelated+mice+character&order=relevance&limit=100&search_page=1&search_type=usertyped&acp=&aco=pixelated+mice+character&get_facets=0&asset_id=710020059
+
+## 3. Improved styles.css
+- Start game/sound on any button press.
+- Implement a horror-style palette.
+- Make sure game elements size stays consistent for all screen sizes and ratios.
+
+## Questions I am trying to answer : 
+- How does audio-visual synchronization affect player immersion ?
+- How to create tension through UI elements ?
+- What's the right balance for information density ?
+
+
+### Describe the type of prototype/fidelity level/tools :
+- Fidelity Level: This is a medium to high prototype with refined visual feedback, sound integration, and smooth transition.
+- Tools: I used p5.js for game mechanics, HTML/CSS for building the UI of my game, p5.sound for audio handling.
+- Type: This is a  look & feel prototype.
+- Focus: The focus of this prototype was visual feedback, styling of the game and overall graphics.
+
+## Lessons Learned
+- Game components should keep the same size/ratio/position on all screen sizes.
+- To improve game's overall visual identity, make sure to follow a clear color palette.
+I decided to keep my color palette simple with tones of black, purple, orange, green, and blue
+which reminds of a horror game style.
+- Players should only be able to to start playing the game as soon as they press a button.
+- The same logic applies to sound being played to avoid issues with p5.sound not playing sound
+properly.
+- To simplify game styling, use already available stock images provided with the Adobe Stock educational license.
+
+## Next Steps
+1. Add a start screen
+2. Implement a story mode so that player goes through a story everytime he strats the game.
+3. Implement game characters design into claw machine mechanics. (For example, when a ball is caught it can be either a mouse
+or a bat). And the player gains points if he catches a mouse and loses points if he catches a bat.
