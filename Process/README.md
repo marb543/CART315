@@ -426,8 +426,6 @@ which I have manually photoshopped later so it fits well in my game. When the us
 
 ![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.5.png)
 
-![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.6.png)
-
 ![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.7.png)
 
 ![This is a demo of Fang & Claw prototype 6](./Media/Fang&Claw-Prototype6.8.png)
